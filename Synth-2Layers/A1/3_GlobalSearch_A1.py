@@ -53,6 +53,6 @@ print('Global search IP excution for ', npos, ' positions: ', f"{endtime:.3}", '
 
 # Save estimated models
 
-np.save('results/model_est_A1', model_est)
-np.save('results/model_est_Q_A1', model_est_Q)
-np.save('results/model_est_IP_A1', model_est_IP)
+np.save('results/model_2Lay_A1', model_est)
+np.save('results/model_2Lay_A1_Q', model_est_Q)
+np.save('results/model_2Lay_A1_IP', model_est_IP)

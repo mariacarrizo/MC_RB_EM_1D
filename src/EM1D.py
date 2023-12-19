@@ -1,5 +1,6 @@
 import numpy as np
 from scipy.constants import mu_0
+import pygimli as pg
 
 # Functions to calculate mutual impedance ratios
 
@@ -59,6 +60,38 @@ def EMf_2Lay_HVP(lambd, sigma1, sigma2, h1, height, offsets, freq, filt):
     IP_p = Z_p.real
     
     return np.hstack((Q_h, Q_v, Q_p, IP_h, IP_v, IP_p))
+
+def EMf_2Lay_HVP_Q(lambd, sigma1, sigma2, h1, height, offsets, freq, filt):
+    """ Forward function for a 2-layered earth model
+    """
+    # Calculate reflection coefficient
+    R0 = R0_2Lay(lambd, sigma1, sigma2, h1, freq)
+    # Calculate mutual impedance ratios for each coil-coil geometry
+    Z_h = Z_H(s=offsets, R_0= R0, lambd=lambd, a=height, filt=filt)
+    Z_v = Z_V(s=offsets, R_0= R0, lambd=lambd, a=height, filt=filt)
+    Z_p = Z_P(s=offsets, R_0= R0, lambd=lambd, a=height, filt=filt)
+    # Obtain quadratures
+    Q_h = Z_h.imag
+    Q_v = Z_v.imag
+    Q_p = Z_p.imag
+    
+    return np.hstack((Q_h, Q_v, Q_p))
+
+def EMf_2Lay_HVP_IP(lambd, sigma1, sigma2, h1, height, offsets, freq, filt):
+    """ Forward function for a 2-layered earth model
+    """
+    # Calculate reflection coefficient
+    R0 = R0_2Lay(lambd, sigma1, sigma2, h1, freq)
+    # Calculate mutual impedance ratios for each coil-coil geometry
+    Z_h = Z_H(s=offsets, R_0= R0, lambd=lambd, a=height, filt=filt)
+    Z_v = Z_V(s=offsets, R_0= R0, lambd=lambd, a=height, filt=filt)
+    Z_p = Z_P(s=offsets, R_0= R0, lambd=lambd, a=height, filt=filt)
+    # Obtain in-phases
+    IP_h = Z_h.real
+    IP_v = Z_v.real
+    IP_p = Z_p.real
+    
+    return np.hstack((IP_h, IP_v, IP_p))
     
 def GlobalSearch(Database, Data, conds, thicks, nsl=51):
     """ This function searches through the lookup table database
@@ -101,3 +134,100 @@ def GlobalSearch(Database, Data, conds, thicks, nsl=51):
 
     return model
 
+class EMf_2Lay_Opt_HVP(pg.Modelling):
+    def __init__(self, lambd, height, offsets, freq, filt):
+        """ Class to Initialize the model for Gradient descent inversion"""
+        super().__init__()        
+        self.lambd = lambd
+        self.height = height
+        self.offsets = offsets
+        self.freq = freq
+        self.filt = filt
+    def response(self, m):
+        lambd = self.lambd
+        height = self.height
+        offsets = self.offsets
+        freq = self.freq
+        filt = self.filt
+        sigma1 = m[0]
+        sigma2 = m[1]
+        h1 = m[2]
+        Z = EMf_2Lay_HVP(lambd, sigma1, sigma2, h1, height, offsets, freq, filt)                           
+        return Z               
+    def createStartModel(self, dataVals):
+        thk_ini = [3]
+        sig_ini =  [100/1000, 100/1000] 
+        x0 = sig_ini + thk_ini
+        return np.array(x0)
+    
+class EMf_2Lay_Opt_HVP_Q(pg.Modelling):
+    def __init__(self, lambd, height, offsets, freq, filt):
+        """ Class to Initialize the model for Gradient descent inversion"""
+        super().__init__()        
+        self.lambd = lambd
+        self.height = height
+        self.offsets = offsets
+        self.freq = freq
+        self.filt = filt
+    def response(self, m):
+        lambd = self.lambd
+        height = self.height
+        offsets = self.offsets
+        freq = self.freq
+        filt = self.filt
+        sigma1 = m[0]
+        sigma2 = m[1]
+        h1 = m[2]
+        Z = EMf_2Lay_HVP_Q(lambd, sigma1, sigma2, h1, height, offsets, freq, filt)                           
+        return Z               
+    def createStartModel(self, dataVals):
+        thk_ini = [3]
+        sig_ini =  [100/1000, 100/1000] 
+        x0 = sig_ini + thk_ini
+        return np.array(x0)
+    
+class EMf_2Lay_Opt_HVP_IP(pg.Modelling):
+    def __init__(self, lambd, height, offsets, freq, filt):
+        """ Class to Initialize the model for Gradient descent inversion"""
+        super().__init__()        
+        self.lambd = lambd
+        self.height = height
+        self.offsets = offsets
+        self.freq = freq
+        self.filt = filt
+    def response(self, m):
+        lambd = self.lambd
+        height = self.height
+        offsets = self.offsets
+        freq = self.freq
+        filt = self.filt
+        sigma1 = m[0]
+        sigma2 = m[1]
+        h1 = m[2]
+        Z = EMf_2Lay_HVP_IP(lambd, sigma1, sigma2, h1, height, offsets, freq, filt)                           
+        return Z               
+    def createStartModel(self, dataVals):
+        thk_ini = [3]
+        sig_ini =  [100/1000, 100/1000] 
+        x0 = sig_ini + thk_ini
+        return np.array(x0)
+
+def ErrorSpace_2Lay(Database, Data, max_error, conds, thicks, nsl=51):
+    """ Returns the models and relative error of the models in the lookup table below a max error"""
+    err = []
+    models_below_err = []
+    for d in range(np.shape(Database)[0]):       
+        diff = np.abs((Database[d] - Data)/Data)
+        merr = np.sum(diff)/len(Data)
+        
+        if merr < max_error:
+            err.append(merr)
+            indx = d
+            for i in range(len(conds)):
+                for j in range(len(conds)):
+                    for k in range(len(thicks)):
+                        idx = k + j*nsl + i*nsl**2
+                        if indx == idx:
+                            model = np.array([conds[i], conds[j], thicks[k]])
+                            models_below_err.append(model)
+    return np.array(err), np.array(models_below_err)
