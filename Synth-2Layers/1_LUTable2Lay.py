@@ -2,11 +2,9 @@
 
 # import libraries
 import numpy as np
-from scipy.constants import mu_0
 from empymod import filters
 import time
 from joblib import Parallel, delayed
-from itertools import product
 
 import sys
 sys.path.insert(1, '../src')
@@ -63,6 +61,3 @@ np.save('data/LUTable_2Lay', DataEM)
 np.save('data/conds', conds)
 np.save('data/thicks', thicks)
 
-#models = list(product(conds, conds, thicks))
-
-#np.save('data/models', models)

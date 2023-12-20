@@ -33,7 +33,7 @@ model_n2 = np.zeros_like(model)
 
 # Estimate with both Quadrature and In Phase
 for p in range(npos):
-    model_n2[p] = GlobalSearch(LUT, data_noise_2[p], conds, thicks)
+    model_n2[p] = GlobalSearch_2Lay(LUT, data_noise_2[p], conds, thicks)
 
 # for noise 5 %
 np.random.seed(2) 
@@ -41,7 +41,7 @@ error_5 = 0.05
 data_noise_5 *= np.random.randn(np.size(data)).reshape(np.shape(data))* error_5+1
 model_n5 = np.zeros_like(model)
 for p in range(npos):
-    model_n5[p] = GlobalSearch(LUT, data_noise_5[p], conds, thicks)
+    model_n5[p] = GlobalSearch_2Lay(LUT, data_noise_5[p], conds, thicks)
 
 # for noise 10%
 np.random.seed(3) 
@@ -49,7 +49,7 @@ error_10 = 0.1
 data_noise_10 *= np.random.randn(np.size(data)).reshape(np.shape(data))* error_10+1
 model_n10 = np.zeros_like(model)
 for p in range(npos):
-    model_n10[p] = GlobalSearch(LUT, data_noise_10[p], conds, thicks)
+    model_n10[p] = GlobalSearch_2Lay(LUT, data_noise_10[p], conds, thicks)
     
 # Save data with added noise
 np.save('data/data_A1_n2', data_noise_2)

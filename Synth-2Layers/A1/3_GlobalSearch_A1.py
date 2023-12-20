@@ -26,7 +26,7 @@ model_est = np.zeros_like(model) # Empty array for estimated model
 
 starttime = time.time()
 for p in range(npos):
-    model_est[p] = GlobalSearch(LUT, data[p], conds, thicks)
+    model_est[p] = GlobalSearch_2Lay(LUT, data[p], conds, thicks)
 endtime = time.time() - starttime
 
 print('Global search Q+IP excution for ', npos, ' positions: ', f"{endtime:.3}", ' seconds')
@@ -36,7 +36,7 @@ model_est_Q = np.zeros_like(model) # Empty array for estimated model
 
 starttime = time.time()
 for p in range(npos):
-    model_est_Q[p] = GlobalSearch(LUT[:,:9], data[p,:9], conds, thicks)
+    model_est_Q[p] = GlobalSearch_2Lay(LUT[:,:9], data[p,:9], conds, thicks)
 endtime = time.time() - starttime
 
 print('Global search Q excution for ', npos, ' positions: ', f"{endtime:.3}", ' seconds')
@@ -46,7 +46,7 @@ model_est_IP = np.zeros_like(model) # Empty array for estimated model
 
 starttime = time.time()
 for p in range(npos):
-    model_est_IP[p] = GlobalSearch(LUT[:,9:], data[p,9:], conds, thicks)
+    model_est_IP[p] = GlobalSearch_2Lay(LUT[:,9:], data[p,9:], conds, thicks)
 endtime = time.time() - starttime
 
 print('Global search IP excution for ', npos, ' positions: ', f"{endtime:.3}", ' seconds')

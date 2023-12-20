@@ -42,7 +42,6 @@ model_est = np.zeros_like(model)
 # Perform inversion for each 1D model per position in stitched section
 for pos in range(npos):
     dataE = data[pos].copy()
-    #dataE *= np.random.randn(len(dataE)) * relativeError + 1.0
     model_est_pos = invEM.run(dataE, relativeError, verbose=False)
     model_est[pos] = model_est_pos
     
@@ -64,7 +63,6 @@ model_est_Q = np.zeros_like(model)
 # Perform inversion for each 1D model per position in stitched section
 for pos in range(npos):
     dataE = data[pos, :9].copy()
-   # dataE *= np.random.randn(len(dataE)) * relativeError + 1.0
     model_est_pos = invEM.run(dataE, relativeError, verbose=False)
     model_est_Q[pos] = model_est_pos
     
@@ -86,7 +84,6 @@ model_est_IP = np.zeros_like(model)
 # Perform inversion for each 1D model per position in stitched section
 for pos in range(npos):
     dataE = data[pos, 9:].copy()
-    # dataE *= np.random.randn(len(dataE)) * relativeError + 1.0
     model_est_pos = invEM.run(dataE, relativeError, verbose=False)
     model_est_IP[pos] = model_est_pos
 

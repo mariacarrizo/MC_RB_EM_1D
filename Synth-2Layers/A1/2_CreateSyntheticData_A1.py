@@ -7,7 +7,7 @@ import time
 import sys
 sys.path.insert(1, '../../src')
 
-from EM1D import EMf_2lay_HVP
+from EM1D import EMf_2Lay_HVP
 
 # Load survey details
 
