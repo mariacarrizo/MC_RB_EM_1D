@@ -161,7 +161,7 @@ cython_debug/
 #
 
 # Folders
-Synth-2Layers/data/
+Synth-2Layers/data/*
 Synth-3Layers/data/
 Synth-2Layers/A1/data/
 Synth-2Layers/A1/results/
