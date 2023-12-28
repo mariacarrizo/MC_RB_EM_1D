@@ -171,4 +171,6 @@ Synth-3Layers/B1/data/*.npy
 Synth-3Layers/B1/results/*.npy
 Synth-3Layers/B2/data/*.npy
 Synth-3Layers/B2/results/*.npy
+Field_Case/data/*.npy
+Field_Case/results/*.npy
 
