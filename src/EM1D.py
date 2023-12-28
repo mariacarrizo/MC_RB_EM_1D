@@ -435,3 +435,75 @@ class EMf_3Lay_GSplusOpt_HVP(pg.Modelling):
     def createStartModel(self, dataVals):
         m0 = self.m0
         return m0
+    
+def EMf_2Lay_HV_field(lambd, sigma1, sigma2, h1, height, offsets, freq, filt):
+    """ Forward function for a 2-layered earth model
+    """
+    # Calculate reflection coefficient
+    R0 = R0_2Lay(lambd, sigma1, sigma2, h1, freq)
+    # Calculate mutual impedance ratios for each coil-coil geometry
+    Z_h = Z_H(s=offsets, R_0= R0, lambd=lambd, a=height, filt=filt)
+    Z_v = Z_V(s=offsets, R_0= R0, lambd=lambd, a=height, filt=filt)
+    Z_p = Z_P(s=offsets, R_0= R0, lambd=lambd, a=height, filt=filt)
+    # Obtain quadratures
+    Q_h = Z_h.imag
+    Q_v = Z_v.imag
+    #Q_p = Z_p.imag
+    # Obtain in-phases
+    IP_h = (Z_h.real)[1:] # only for the offsets >2
+    IP_v = (Z_v.real)[1:] # only for the offsets >2
+    #IP_p = Z_p.real
+    
+    return np.hstack((Q_h, Q_v, IP_h, IP_v))
+
+
+class EMf_2Lay_Opt_HV_field(pg.Modelling):
+    def __init__(self, lambd, height, offsets, freq, filt):
+        """ Class to Initialize the model for Gradient descent inversion"""
+        super().__init__()        
+        self.lambd = lambd
+        self.height = height
+        self.offsets = offsets
+        self.freq = freq
+        self.filt = filt
+    def response(self, m):
+        lambd = self.lambd
+        height = self.height
+        offsets = self.offsets
+        freq = self.freq
+        filt = self.filt
+        sigma1 = m[0]
+        sigma2 = m[1]
+        h1 = m[2]
+        Z = EMf_2Lay_HV_field(lambd, sigma1, sigma2, h1, height, offsets, freq, filt)                           
+        return Z               
+    def createStartModel(self, dataVals):
+        thk_ini = [2]
+        sig_ini =  [100/1000, 100/1000] 
+        m0 = sig_ini + thk_ini
+        return np.array(m0)
+    
+class EMf_2Lay_GSplusOpt_HV_field(pg.Modelling):
+    def __init__(self, lambd, height, offsets, freq, filt, m0):
+        """ Class to Initialize the model for Gradient descent inversion"""
+        super().__init__()        
+        self.lambd = lambd
+        self.height = height
+        self.offsets = offsets
+        self.freq = freq
+        self.filt = filt
+        self.m0 = m0
+    def response(self, m):
+        lambd = self.lambd
+        height = self.height
+        offsets = self.offsets
+        freq = self.freq
+        filt = self.filt
+        sigma1 = m[0]
+        sigma2 = m[1]
+        h1 = m[2]
+        Z = EMf_2Lay_HV_field(lambd, sigma1, sigma2, h1, height, offsets, freq, filt)
+        return Z               
+    def createStartModel(self, dataVals):
+        m0 = self.m0
+        return m0
