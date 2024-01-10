@@ -253,7 +253,7 @@ def EMf_3Lay_HVP_LU(lambd, sigma1, sigma2, sigma3, h1, h2, height, offsets, freq
     IP_v = Z_v.real
     IP_p = Z_p.real
     
-    return np.hstack((Q_h, Q_v, Q_p, IP_h, IP_v, IP_p), dtype='float32')
+    return np.hstack((Q_h, Q_v, Q_p, IP_h, IP_v, IP_p)).astype(np.float32)
 
 def EMf_3Lay_HVP(lambd, sigma1, sigma2, sigma3, h1, h2, height, offsets, freq, filt):
     """ Forward function for a 3-layered earth model
