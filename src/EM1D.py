@@ -234,8 +234,9 @@ def ErrorSpace_2Lay(Database, Data, max_error, conds, thicks, nsl=51):
                             models_below_err.append(model)
     return np.array(err), np.array(models_below_err)
 
-def EMf_3Lay_HVP(lambd, sigma1, sigma2, sigma3, h1, h2, height, offsets, freq, filt):
-    """ Forward function for a 2-layered earth model
+def EMf_3Lay_HVP_LU(lambd, sigma1, sigma2, sigma3, h1, h2, height, offsets, freq, filt):
+    """ Forward function for a 3-layered earth model
+    to generate Lookup table
     """
     # Calculate reflection coefficient
     R0 = R0_3Lay(lambd, sigma1, sigma2, sigma3, h1, h2, freq)
@@ -253,6 +254,26 @@ def EMf_3Lay_HVP(lambd, sigma1, sigma2, sigma3, h1, h2, height, offsets, freq, f
     IP_p = Z_p.real
     
     return np.hstack((Q_h, Q_v, Q_p, IP_h, IP_v, IP_p), dtype='float32')
+
+def EMf_3Lay_HVP(lambd, sigma1, sigma2, sigma3, h1, h2, height, offsets, freq, filt):
+    """ Forward function for a 3-layered earth model
+    """
+    # Calculate reflection coefficient
+    R0 = R0_3Lay(lambd, sigma1, sigma2, sigma3, h1, h2, freq)
+    # Calculate mutual impedance ratios for each coil-coil geometry
+    Z_h = Z_H(s=offsets, R_0= R0, lambd=lambd, a=height, filt=filt)
+    Z_v = Z_V(s=offsets, R_0= R0, lambd=lambd, a=height, filt=filt)
+    Z_p = Z_P(s=offsets, R_0= R0, lambd=lambd, a=height, filt=filt)
+    # Obtain quadratures
+    Q_h = Z_h.imag
+    Q_v = Z_v.imag
+    Q_p = Z_p.imag
+    # Obtain in-phases
+    IP_h = Z_h.real
+    IP_v = Z_v.real
+    IP_p = Z_p.real
+    
+    return np.hstack((Q_h, Q_v, Q_p, IP_h, IP_v, IP_p))
 
 def EMf_3Lay_HVP_Q(lambd, sigma1, sigma2, sigma3, h1, h2, height, offsets, freq, filt):
     """ Forward function for a 2-layered earth model
