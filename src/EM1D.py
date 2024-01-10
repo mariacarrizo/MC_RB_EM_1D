@@ -331,7 +331,7 @@ def GlobalSearch_3Lay(Database, Data, conds, thicks, nsl=51):
     
     # Evaluate for min error
     nZdiff = ((Database[:] - Data)**2)/(Data**2)
-    rmse_vector = (np.sqrt(np.sum(nZdiff, axis=1)))/len(Data)
+    rmse_vector = np.log10(np.sqrt(np.sum(nZdiff, axis=1)))/len(Data)
     indx_min_rmse = np.argmin(rmse_vector)
 
     # Return model that corresponds to the index
