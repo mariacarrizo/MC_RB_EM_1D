@@ -38,22 +38,26 @@ error = 1e-3 # introduce here the error you want to test
 relativeError = np.ones_like(data[0]) * error
 model_est = np.zeros_like(model)
 
+# Setting a lower boundary of conductivities 10 mS/m
+transModel = pg.trans.TransLogLU(0.01,7) 
+invEM.modelTrans = transModel
+
 # Start inversion
 # Perform inversion for each 1D model per position in stitched section
 for pos in range(npos):
     dataE = data[pos].copy()
     model_est_pos = invEM.run(dataE, relativeError, verbose=False)
     model_est[pos] = model_est_pos
-    if (model_est[pos, (model_est[pos,0] >1)]).any():
-        model_est[pos,0] = 1
-    if (model_est[pos, (model_est[pos,1] >1)]).any():
-        model_est[pos,1] = 1
-    if (model_est[pos, (model_est[pos,2] >1)]).any():
-        model_est[pos,2] = 1
-    if (model_est[pos, (model_est[pos,3] >10)]).any():
-        model_est[pos,3] = 10
-    if (model_est[pos, (model_est[pos,3] >10)]).any():
-        model_est[pos,4] = 10
+#    if (model_est[pos, (model_est[pos,0] >1)]).any():
+#        model_est[pos,0] = 1
+#    if (model_est[pos, (model_est[pos,1] >1)]).any():
+#        model_est[pos,1] = 1
+#    if (model_est[pos, (model_est[pos,2] >1)]).any():
+#        model_est[pos,2] = 1
+#    if (model_est[pos, (model_est[pos,3] >10)]).any():
+#        model_est[pos,3] = 10
+#    if (model_est[pos, (model_est[pos,3] >10)]).any():
+#        model_est[pos,4] = 10
         
 # Optimization Q 
 
@@ -75,16 +79,16 @@ for pos in range(npos):
     dataE = data[pos, :9].copy()
     model_est_pos = invEM.run(dataE, relativeError, verbose=False)
     model_est_Q[pos] = model_est_pos
-    if (model_est_Q[pos, (model_est_Q[pos,0] >1)]).any():
-        model_est_Q[pos,0] = 1
-    if (model_est_Q[pos, (model_est_Q[pos,1] >1)]).any():
-        model_est_Q[pos,1] = 1
-    if (model_est_Q[pos, (model_est_Q[pos,2] >1)]).any():
-        model_est_Q[pos,2] = 1
-    if (model_est_Q[pos, (model_est_Q[pos,3] >10)]).any():
-        model_est_Q[pos,3] = 10
-    if (model_est_Q[pos, (model_est_Q[pos,3] >10)]).any():
-        model_est_Q[pos,4] = 10
+#    if (model_est_Q[pos, (model_est_Q[pos,0] >1)]).any():
+#        model_est_Q[pos,0] = 1
+#    if (model_est_Q[pos, (model_est_Q[pos,1] >1)]).any():
+#        model_est_Q[pos,1] = 1
+#    if (model_est_Q[pos, (model_est_Q[pos,2] >1)]).any():
+#        model_est_Q[pos,2] = 1
+#    if (model_est_Q[pos, (model_est_Q[pos,3] >10)]).any():
+#        model_est_Q[pos,3] = 10
+#    if (model_est_Q[pos, (model_est_Q[pos,3] >10)]).any():
+#        model_est_Q[pos,4] = 10
         
 # Optimization IP 
 
@@ -106,16 +110,16 @@ for pos in range(npos):
     dataE = data[pos, 9:].copy()
     model_est_pos = invEM.run(dataE, relativeError, verbose=False)
     model_est_IP[pos] = model_est_pos
-    if (model_est_IP[pos, (model_est_IP[pos,0] >1)]).any():
-        model_est_IP[pos,0] = 1
-    if (model_est_IP[pos, (model_est_IP[pos,1] >1)]).any():
-        model_est_IP[pos,1] = 1
-    if (model_est_IP[pos, (model_est_IP[pos,2] >1)]).any():
-        model_est_IP[pos,2] = 1
-    if (model_est_IP[pos, (model_est_IP[pos,3] >10)]).any():
-        model_est_IP[pos,3] = 10
-    if (model_est_IP[pos, (model_est_IP[pos,3] >10)]).any():
-        model_est_IP[pos,4] = 10
+#    if (model_est_IP[pos, (model_est_IP[pos,0] >1)]).any():
+#        model_est_IP[pos,0] = 1
+#    if (model_est_IP[pos, (model_est_IP[pos,1] >1)]).any():
+#        model_est_IP[pos,1] = 1
+#    if (model_est_IP[pos, (model_est_IP[pos,2] >1)]).any():
+#        model_est_IP[pos,2] = 1
+#    if (model_est_IP[pos, (model_est_IP[pos,3] >10)]).any():
+#        model_est_IP[pos,3] = 10
+#    if (model_est_IP[pos, (model_est_IP[pos,3] >10)]).any():
+#        model_est_IP[pos,4] = 10
         
 # Save estimates
 np.save('results/model_3Lay_B2_Opt', model_est)

@@ -43,19 +43,23 @@ for pos in range(npos):
     # Create inversion
     invEM = pg.Inversion()
     invEM.setForwardOperator(EMf)
+    
+    # Setting a lower boundary of conductivities 10 mS/m
+    transModel = pg.trans.TransLogLU(0.01,7) 
+    invEM.modelTrans = transModel
 
     dataE = data[pos].copy()
     model_est_pos = invEM.run(dataE, relativeError, verbose=False)
     model_est[pos] = model_est_pos
-    if (model_est[pos, (model_est[pos,0] >1)]).any():
-        model_est[pos,0] = 1
-    if (model_est[pos, (model_est[pos,1] >1)]).any():
-        model_est[pos,1] = 1
-    if (model_est[pos, (model_est[pos,2] >1)]).any():
-        model_est[pos,2] = 1
-    if (model_est[pos, (model_est[pos,3] >10)]).any():
-        model_est[pos,3] = 10
-    if (model_est[pos, (model_est[pos,3] >10)]).any():
-        model_est[pos,4] = 10
+#    if (model_est[pos, (model_est[pos,0] >1)]).any():
+#        model_est[pos,0] = 1
+#    if (model_est[pos, (model_est[pos,1] >1)]).any():
+#        model_est[pos,1] = 1
+#    if (model_est[pos, (model_est[pos,2] >1)]).any():
+#        model_est[pos,2] = 1
+#    if (model_est[pos, (model_est[pos,3] >10)]).any():
+#        model_est[pos,3] = 10
+#    if (model_est[pos, (model_est[pos,3] >10)]).any():
+#        model_est[pos,4] = 10
         
 np.save('results/model_3Lay_GSplusOpt_B2', model_est)
