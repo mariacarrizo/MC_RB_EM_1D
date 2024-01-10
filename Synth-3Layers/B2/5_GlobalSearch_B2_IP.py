@@ -15,6 +15,8 @@ sys.path.insert(0, path)
 # Import global search function
 from EM1D import GlobalSearch_3Lay
 
+n_workers=8
+
 # Load conductivities and thicknesses sampled
 conds = np.load('../data/conds.npy')
 thicks = np.load('../data/thicks.npy')
@@ -31,7 +33,7 @@ npos = len(data)
 print('Started searching error vector using Lookup table ...')
 startTime = time.time()
 
-model = Parallel(n_jobs=-1,verbose=0)(delayed(GlobalSearch_3Lay)(LUT[:,9:], data[pos,9:],
+model = Parallel(n_jobs=n_workers,verbose=0)(delayed(GlobalSearch_3Lay)(LUT[:,9:], data[pos,9:],
                                                                  conds, thicks) for pos in range(npos))
 
 executionTime = time.time() - startTime

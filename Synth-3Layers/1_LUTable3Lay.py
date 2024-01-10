@@ -15,7 +15,7 @@ from EM1D import EMf_3Lay_HVP
 
 # set here the number of workers to compute
 # if set to -1 will take all the workers available
-n_workers = -1
+n_workers = 48
 
 # Define hankel filter
 filt = filters.key_201_2012() 
@@ -39,7 +39,7 @@ survey = {'offsets': offsets,
 np.save('data/survey_3Lay.npy', survey)
 
 # sampling of conductivities
-nsl = 11 # number of samples
+nsl = 51 # number of samples
 s0 = -2 # minimum conductivity in S/m
 s1 = -0.5 # maximum conductivity in S/m
 # conductivities array
