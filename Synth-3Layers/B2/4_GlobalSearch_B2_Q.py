@@ -15,7 +15,7 @@ sys.path.insert(0, path)
 # Import global search function
 from EM1D import GlobalSearch_3Lay
 
-n_workers=8
+n_workers=4
 
 # Load conductivities and thicknesses sampled
 conds = np.load('../data/conds.npy')
