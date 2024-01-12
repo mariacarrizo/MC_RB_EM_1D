@@ -307,7 +307,7 @@ def EMf_3Lay_HVP_IP(lambd, sigma1, sigma2, sigma3, h1, h2, height, offsets, freq
     
     return np.hstack((IP_h, IP_v, IP_p))
 
-def GlobalSearch_3Lay(Database, Data, conds, thicks, nsl=51):
+def GlobalSearch_3Lay(Database, Data, conds, thicks, norm, nsl=51):
     """ This function searches through the lookup table database
     for the best data fit, and then finds the corresponding model
 
@@ -330,8 +330,8 @@ def GlobalSearch_3Lay(Database, Data, conds, thicks, nsl=51):
     """
     
     # Evaluate for min error
-    nZdiff = ((Database[:] - Data)**2)/(Data**2)
-    rmse_vector = np.log10(np.sqrt(np.sum(nZdiff, axis=1)))/len(Data)
+    nZdiff = ((Database[:] - Data)**2)/norm
+    rmse_vector = np.sqrt(np.sum(nZdiff, axis=1)/len(Data))
     indx_min_rmse = np.argmin(rmse_vector)
 
     # Return model that corresponds to the index

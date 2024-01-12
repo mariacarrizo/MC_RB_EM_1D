@@ -15,6 +15,18 @@ sys.path.insert(0, path)
 # Import global search function
 from EM1D import GlobalSearch_3Lay
 
+# Load survey information
+survey = np.load('../data/survey_3Lay.npy', allow_pickle=True).item()
+
+offsets = survey['offsets']
+height = survey['height']
+freq = survey['freq']
+lambd = survey['lambd']
+filt = survey['filt']
+
+# Normalize by offset
+norm = np.hstack((offsets, offsets, offsets, offsets, offsets, offsets))
+
 n_workers=8
 
 # Load conductivities and thicknesses sampled
@@ -34,7 +46,7 @@ print('Started searching error vector using Lookup table ...')
 startTime = time.time()
 
 model = Parallel(n_jobs=n_workers,verbose=0)(delayed(GlobalSearch_3Lay)(LUT, data[pos],
-                                                                 conds, thicks) for pos in range(npos))
+                                                                 conds, thicks, norm) for pos in range(npos))
 
 executionTime = time.time() - startTime
 print('Execution time in seconds: ' + str(executionTime))
