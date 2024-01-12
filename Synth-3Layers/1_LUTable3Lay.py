@@ -47,7 +47,7 @@ conds = np.logspace(s0, s1, nsl)
 
 # Sampling of 1st layer thickness
 th0 = 0.1 # minimum thickness in m
-th1 = 6   # maximum thickness in m
+th1 = 4   # maximum thickness in m
 # thickness array
 thicks = np.linspace(th0, th1, nsl)
 
