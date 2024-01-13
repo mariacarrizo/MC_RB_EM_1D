@@ -41,11 +41,14 @@ LUT = np.load('../data/LUTable_3Lay.npy')
 data = np.load('data/data_synth_3Lay_B2.npy')
 npos = len(data)
 
+LUT_norm = LUT[:]*norm
+data_norm = data[:]*norm
+
 # Start inversion
 print('Started searching error vector using Lookup table ...')
 startTime = time.time()
 
-model = Parallel(n_jobs=n_workers,verbose=0)(delayed(GlobalSearch_3Lay)(LUT, data[pos],
+model = Parallel(n_jobs=n_workers,verbose=0)(delayed(GlobalSearch_3Lay)(LUT_norm, data_norm[pos],
                                                                  conds, thicks, norm) for pos in range(npos))
 
 executionTime = time.time() - startTime

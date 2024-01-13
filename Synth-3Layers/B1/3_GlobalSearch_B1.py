@@ -45,7 +45,10 @@ norm = np.hstack((offsets, offsets, offsets, offsets, offsets, offsets))
 print('Started searching error vector using Lookup table ...')
 startTime = time.time()
 
-model = Parallel(n_jobs=n_workers,verbose=0)(delayed(GlobalSearch_3Lay)(LUT, data[pos],
+LUT_norm = LUT[:]*norm
+data_norm = data[:]*norm
+
+model = Parallel(n_jobs=n_workers,verbose=0)(delayed(GlobalSearch_3Lay)(LUT_norm, data_norm[pos],
                                                                  conds, thicks, norm) for pos in range(npos))
 
 executionTime = time.time() - startTime
