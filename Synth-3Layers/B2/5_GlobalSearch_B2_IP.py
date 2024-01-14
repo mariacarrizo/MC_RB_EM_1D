@@ -27,7 +27,7 @@ filt = survey['filt']
 # Normalize by offset
 norm = np.hstack((offsets, offsets, offsets, offsets, offsets, offsets))
 
-n_workers=4
+n_workers=2
 
 # Load conductivities and thicknesses sampled
 conds = np.load('../data/conds.npy')
