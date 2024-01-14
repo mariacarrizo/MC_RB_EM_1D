@@ -51,15 +51,15 @@ def EMf_2Lay_HVP(lambd, sigma1, sigma2, h1, height, offsets, freq, filt):
     # Calculate mutual impedance ratios for each coil-coil geometry
     Z_h = Z_H(s=offsets, R_0= R0, lambd=lambd, a=height, filt=filt)
     Z_v = Z_V(s=offsets, R_0= R0, lambd=lambd, a=height, filt=filt)
-    Z_p = Z_P(s=offsets, R_0= R0, lambd=lambd, a=height, filt=filt)
+    Z_p = Z_P(s=offsets+0.1, R_0= R0, lambd=lambd, a=height, filt=filt)
     # Obtain quadratures
-    Q_h = Z_h.imag
-    Q_v = Z_v.imag
-    Q_p = Z_p.imag
+    Q_h = np.abs(Z_h.imag)
+    Q_v = np.abs(Z_v.imag)
+    Q_p = np.abs(Z_p.imag)
     # Obtain in-phases
-    IP_h = Z_h.real
-    IP_v = Z_v.real
-    IP_p = Z_p.real
+    IP_h = np.abs(Z_h.real)
+    IP_v = np.abs(Z_v.real)
+    IP_p = np.abs(Z_p.real)
     
     return np.hstack((Q_h, Q_v, Q_p, IP_h, IP_v, IP_p))
 
@@ -71,11 +71,11 @@ def EMf_2Lay_HVP_Q(lambd, sigma1, sigma2, h1, height, offsets, freq, filt):
     # Calculate mutual impedance ratios for each coil-coil geometry
     Z_h = Z_H(s=offsets, R_0= R0, lambd=lambd, a=height, filt=filt)
     Z_v = Z_V(s=offsets, R_0= R0, lambd=lambd, a=height, filt=filt)
-    Z_p = Z_P(s=offsets, R_0= R0, lambd=lambd, a=height, filt=filt)
+    Z_p = Z_P(s=offsets+0.1, R_0= R0, lambd=lambd, a=height, filt=filt)
     # Obtain quadratures
-    Q_h = Z_h.imag
-    Q_v = Z_v.imag
-    Q_p = Z_p.imag
+    Q_h = np.abs(Z_h.imag)
+    Q_v = np.abs(Z_v.imag)
+    Q_p = np.abs(Z_p.imag)
     
     return np.hstack((Q_h, Q_v, Q_p))
 
@@ -87,11 +87,11 @@ def EMf_2Lay_HVP_IP(lambd, sigma1, sigma2, h1, height, offsets, freq, filt):
     # Calculate mutual impedance ratios for each coil-coil geometry
     Z_h = Z_H(s=offsets, R_0= R0, lambd=lambd, a=height, filt=filt)
     Z_v = Z_V(s=offsets, R_0= R0, lambd=lambd, a=height, filt=filt)
-    Z_p = Z_P(s=offsets, R_0= R0, lambd=lambd, a=height, filt=filt)
+    Z_p = Z_P(s=offsets+0.1, R_0= R0, lambd=lambd, a=height, filt=filt)
     # Obtain in-phases
-    IP_h = Z_h.real
-    IP_v = Z_v.real
-    IP_p = Z_p.real
+    IP_h = np.abs(Z_h.real)
+    IP_v = np.abs(Z_v.real)
+    IP_p = np.abs(Z_p.real)
     
     return np.hstack((IP_h, IP_v, IP_p))
     
@@ -243,15 +243,15 @@ def EMf_3Lay_HVP_LU(lambd, sigma1, sigma2, sigma3, h1, h2, height, offsets, freq
     # Calculate mutual impedance ratios for each coil-coil geometry
     Z_h = Z_H(s=offsets, R_0= R0, lambd=lambd, a=height, filt=filt)
     Z_v = Z_V(s=offsets, R_0= R0, lambd=lambd, a=height, filt=filt)
-    Z_p = Z_P(s=offsets, R_0= R0, lambd=lambd, a=height, filt=filt)
+    Z_p = Z_P(s=offsets+0.1, R_0= R0, lambd=lambd, a=height, filt=filt)
     # Obtain quadratures
-    Q_h = Z_h.imag
-    Q_v = Z_v.imag
-    Q_p = Z_p.imag
+    Q_h = np.abs(Z_h.imag)
+    Q_v = np.abs(Z_v.imag)
+    Q_p = np.abs(Z_p.imag)
     # Obtain in-phases
-    IP_h = Z_h.real
-    IP_v = Z_v.real
-    IP_p = Z_p.real
+    IP_h = np.abs(Z_h.real)
+    IP_v = np.abs(Z_v.real)
+    IP_p = np.abs(Z_p.real)
     
     return np.hstack((Q_h, Q_v, Q_p, IP_h, IP_v, IP_p)).astype(np.float32)
 
@@ -263,7 +263,7 @@ def EMf_3Lay_HVP(lambd, sigma1, sigma2, sigma3, h1, h2, height, offsets, freq, f
     # Calculate mutual impedance ratios for each coil-coil geometry
     Z_h = Z_H(s=offsets, R_0= R0, lambd=lambd, a=height, filt=filt)
     Z_v = Z_V(s=offsets, R_0= R0, lambd=lambd, a=height, filt=filt)
-    Z_p = Z_P(s=offsets, R_0= R0, lambd=lambd, a=height, filt=filt)
+    Z_p = Z_P(s=offsets+0.1, R_0= R0, lambd=lambd, a=height, filt=filt)
     # Obtain quadratures
     Q_h = np.abs(Z_h.imag)
     Q_v = np.abs(Z_v.imag)
@@ -283,7 +283,7 @@ def EMf_3Lay_HVP_Q(lambd, sigma1, sigma2, sigma3, h1, h2, height, offsets, freq,
     # Calculate mutual impedance ratios for each coil-coil geometry
     Z_h = Z_H(s=offsets, R_0= R0, lambd=lambd, a=height, filt=filt)
     Z_v = Z_V(s=offsets, R_0= R0, lambd=lambd, a=height, filt=filt)
-    Z_p = Z_P(s=offsets, R_0= R0, lambd=lambd, a=height, filt=filt)
+    Z_p = Z_P(s=offsets+0.1, R_0= R0, lambd=lambd, a=height, filt=filt)
     # Obtain quadratures
     Q_h = np.abs(Z_h.imag)
     Q_v = np.abs(Z_v.imag)
@@ -299,7 +299,7 @@ def EMf_3Lay_HVP_IP(lambd, sigma1, sigma2, sigma3, h1, h2, height, offsets, freq
     # Calculate mutual impedance ratios for each coil-coil geometry
     Z_h = Z_H(s=offsets, R_0= R0, lambd=lambd, a=height, filt=filt)
     Z_v = Z_V(s=offsets, R_0= R0, lambd=lambd, a=height, filt=filt)
-    Z_p = Z_P(s=offsets, R_0= R0, lambd=lambd, a=height, filt=filt)
+    Z_p = Z_P(s=offsets+0.1, R_0= R0, lambd=lambd, a=height, filt=filt)
     # Obtain in-phases
     IP_h = np.abs(Z_h.real)
     IP_v = np.abs(Z_v.real)
@@ -465,14 +465,14 @@ def EMf_2Lay_HV_field(lambd, sigma1, sigma2, h1, height, offsets, freq, filt):
     # Calculate mutual impedance ratios for each coil-coil geometry
     Z_h = Z_H(s=offsets, R_0= R0, lambd=lambd, a=height, filt=filt)
     Z_v = Z_V(s=offsets, R_0= R0, lambd=lambd, a=height, filt=filt)
-    Z_p = Z_P(s=offsets, R_0= R0, lambd=lambd, a=height, filt=filt)
+    Z_p = Z_P(s=offsets+0.1, R_0= R0, lambd=lambd, a=height, filt=filt)
     # Obtain quadratures
-    Q_h = Z_h.imag
-    Q_v = Z_v.imag
+    Q_h = np.abs(Z_h.imag)
+    Q_v = np.abs(Z_v.imag)
     #Q_p = Z_p.imag
     # Obtain in-phases
-    IP_h = (Z_h.real)[1:] # only for the offsets >2
-    IP_v = (Z_v.real)[1:] # only for the offsets >2
+    IP_h = np.abs((Z_h.real)[1:]) # only for the offsets >2
+    IP_v = np.abs((Z_v.real)[1:]) # only for the offsets >2
     #IP_p = Z_p.real
     
     return np.hstack((Q_h, Q_v, IP_h, IP_v))
