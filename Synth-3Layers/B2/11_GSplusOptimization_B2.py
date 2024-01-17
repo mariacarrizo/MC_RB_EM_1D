@@ -45,7 +45,7 @@ for pos in range(npos):
     invEM.setForwardOperator(EMf)
     
     # Setting a lower boundary of conductivities 10 mS/m
-    transModel = pg.trans.TransLogLU(0.01,7) 
+    transModel = pg.trans.TransLogLU(0.001,7) 
     invEM.modelTrans = transModel
 
     dataE = data[pos].copy()

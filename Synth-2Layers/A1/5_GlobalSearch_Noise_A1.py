@@ -6,7 +6,7 @@ import sys
 sys.path.insert(1, '../../src')
 
 # Load function that performs global search in lookup table
-from EM1D import GlobalSearch
+from EM1D import GlobalSearch_2Lay
 
 # Load lookup table and sampling 
 LUT = np.load('../data/LUTable_2Lay.npy')

@@ -39,7 +39,7 @@ relativeError = np.ones_like(data[0]) * error
 model_est = np.zeros_like(model)
 
 # Setting a lower boundary of conductivities 10 mS/m
-transModel = pg.trans.TransLogLU(0.01,7) 
+transModel = pg.trans.TransLogLU(0.001,7) 
 invEM.modelTrans = transModel
 
 # Start inversion
@@ -74,7 +74,7 @@ relativeError = np.ones_like(data[0, :9]) * error
 model_est_Q = np.zeros_like(model)
 
 # Setting a lower boundary of conductivities 10 mS/m
-transModel = pg.trans.TransLogLU(0.01,7) 
+transModel = pg.trans.TransLogLU(0.001,7) 
 invEM.modelTrans = transModel
 
 
@@ -110,7 +110,7 @@ relativeError = np.ones_like(data[0, 9:]) * error
 model_est_IP = np.zeros_like(model)
 
 # Setting a lower boundary of conductivities 10 mS/m
-transModel = pg.trans.TransLogLU(0.01,7) 
+transModel = pg.trans.TransLogLU(0.001,7) 
 invEM.modelTrans = transModel
 
 # Start inversion
