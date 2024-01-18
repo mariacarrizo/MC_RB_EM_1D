@@ -370,7 +370,7 @@ class EMf_3Lay_Opt_HVP(pg.Modelling):
         return Z               
     def createStartModel(self, dataVals):
         thk_ini = [2,2]
-        sig_ini =  [100/1000, 100/1000, 100/1000] 
+        sig_ini =  [50/1000, 50/1000, 50/1000] 
         m0 = sig_ini + thk_ini
         return np.array(m0)
     
@@ -398,7 +398,7 @@ class EMf_3Lay_Opt_HVP_Q(pg.Modelling):
         return Z               
     def createStartModel(self, dataVals):
         thk_ini = [2,2]
-        sig_ini =  [100/1000, 100/1000, 100/1000] 
+        sig_ini =  [50/1000, 50/1000, 50/1000] 
         m0 = sig_ini + thk_ini
         return np.array(m0)
     
@@ -426,7 +426,7 @@ class EMf_3Lay_Opt_HVP_IP(pg.Modelling):
         return Z               
     def createStartModel(self, dataVals):
         thk_ini = [2,2]
-        sig_ini =  [100/1000, 100/1000, 100/1000] 
+        sig_ini =  [50/1000, 50/1000, 50/1000] 
         m0 = sig_ini + thk_ini
         return np.array(m0)
     
