@@ -22,7 +22,7 @@ nlayer = 3 # number of layer
 npos = 20 # number of sampling positions
 
 # 3 layered conductivities
-sigmas = [1/5, 0.03, 1/5] 
+sigmas = [100/1000, 20/1000, 100/1000] 
 sigmas = np.ones((npos, nlayer))*sigmas
 x = np.linspace(0, 20, npos)[:,None]
 
