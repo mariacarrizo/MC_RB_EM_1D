@@ -32,3 +32,7 @@ pip install -r requirements.txt
 
 ## Data
 - Field data acquired with a DUALEM842s EMI instrument is stored in file `FieldCase/data/Field_data.npy`
+
+### Citation
+1. Forward modelling using `empymod` from: `Werthmüller, D., 2017 <https://doi.org/10.1190/geo2016-0626.1>`
+2. Gradient based inversion using `pygimli` from: 
