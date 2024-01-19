@@ -22,7 +22,6 @@ pip install -r requirements.txt
 3. Run the codes by numeric order:
    - 1.
 ```
-
 ## Notes
 - Data is simulated for an EMI device with the following characteristics
   - Frequency: 9000 Hz
@@ -32,6 +31,7 @@ pip install -r requirements.txt
 
 ## Data
 - Field data acquired with a DUALEM842s EMI instrument is stored in file `FieldCase/data/Field_data.npy`
+```
 
 ### Citation
 1. Forward modelling using `empymod` from: `Werthmüller, D., 2017 <https://doi.org/10.1190/geo2016-0626.1>`
