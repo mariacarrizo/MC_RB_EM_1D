@@ -34,5 +34,6 @@ pip install -r requirements.txt
 ```
 
 ### Citation
-1. Forward modelling using `empymod` from: `Werthmüller (2017) <https://doi.org/10.1190/geo2016-0626.1>`_.
-2. Gradient based inversion using `pygimli` from: 
+Forward modelling using `empymod` from: `Werthmüller (2017)
+<https://doi.org/10.1190/geo2016-0626.1>`_.
+Gradient based inversion using `pygimli` from: 
