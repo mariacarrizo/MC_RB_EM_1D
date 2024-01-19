@@ -1,6 +1,6 @@
 # GSplusOpt
 
-This repo contains the implementation of the algorithms shown in the paper: [Combining global search inversion and optimization to estimate 1D electrical conductivity using frequency domain electromagnetic induction measurements].
+This repo contains the implementation of the algorithms shown in: [Combining global search inversion and optimization to estimate 1D electrical conductivity using frequency domain electromagnetic induction measurements].
 
 The repository includes:
 - Python 3 codes for creating the synthetic data
