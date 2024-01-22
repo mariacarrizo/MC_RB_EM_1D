@@ -1,9 +1,9 @@
-# Import libraries
+# Script to perform global search inversion for Field case
 
+# Import libraries
 import numpy as np
 import time
 import pandas as pd
-
 import sys
 sys.path.insert(1, '../src')
 
@@ -21,9 +21,11 @@ Dataframe = pd.DataFrame(np.load('data/Field_data.npy'),
                                    'V2Q','V4Q','V8Q','P2Q','P4Q','P8Q',
                                    'H4IP','H8IP','V4IP','V8IP'])
 
+# Obtain H and V quadrature and in-phase measurements
+# For in-phase we only use measurements for offsets > 4 m
 data = np.array(pd.concat([Dataframe.loc[:,'H2Q':'V8Q'], Dataframe.loc[:,'H4IP':]], axis=1))
 
-# number of 1D positions
+# number of 1D models
 npos = len(data)
 
 # Estimate with both Quadrature and In Phase

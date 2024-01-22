@@ -1,10 +1,12 @@
-# Testing optimization with noise case A1
+# Testing gradient based inversion for case A.2 with noisy data
 
+# import libraries
 import pygimli as pg
 import numpy as np
 import sys
 sys.path.insert(1, '../../src')
 
+# Import forward modelling class for 2-layered models
 from EM1D import EMf_2Lay_Opt_HVP
 
 # Import the conductivities and thicknesses used to create the LU table
@@ -24,7 +26,7 @@ model = np.load('data/model_synth_2Lay_A2.npy')
 
 # Data array for all the 1D stitched models
 data = np.load('data/data_synth_2Lay_A2.npy')
-npos = len(data) # number of positions
+npos = len(data) # number of 1D models
 
 # Load data with added noise
 data_noise_2 = np.load('data/data_A2_n2.npy')
@@ -40,7 +42,7 @@ invEM = pg.Inversion()
 invEM.setForwardOperator(EMf)
 
 # Relative error array
-error = 1e-3 # introduce here the error you want to test
+error = 1e-3 # relative error
 relativeError = np.ones_like(data[0]) * error
 model_noise_2 = np.zeros_like(model)
 
@@ -82,7 +84,7 @@ for pos in range(npos):
     model_est_pos = invEM.run(data_noise_10[pos], relativeError, verbose=False)
     model_noise_10[pos] = model_est_pos
     
-# Save estimates
+# Save estimated models
 np.save('results/model_2Lay_A2_Opt_n2', model_noise_2)
 np.save('results/model_2Lay_A2_Opt_n5', model_noise_5)
 np.save('results/model_2Lay_A2_Opt_n10', model_noise_10)

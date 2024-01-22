@@ -1,10 +1,12 @@
-# Testing optimization with noise case A1
+# Testing optimization case A.1 with noisy data 
 
+# import libraries
 import pygimli as pg
 import numpy as np
 import sys
 sys.path.insert(1, '../../src')
 
+# Import forward modelling class for 2-layered models
 from EM1D import EMf_2Lay_Opt_HVP
 
 # Import the conductivities and thicknesses used to create the LU table
@@ -21,35 +23,37 @@ filt = survey['filt']
 
 # Import true models and data 
 model = np.load('data/model_synth_2Lay_A1.npy')
-
-# Data array for all the 1D stitched models
 data = np.load('data/data_synth_2Lay_A1.npy')
-npos = len(data) # number of positions
+
+# number of 1D models 
+npos = len(data) 
 
 # Load data with added noise
 data_noise_2 = np.load('data/data_A1_n2.npy')
 data_noise_5 = np.load('data/data_A1_n5.npy')
 data_noise_10 = np.load('data/data_A1_n10.npy')
 
-# Optimization Q + IP noise 2.5 %
+#%%
+# Optimization for data [Q + IP] noise 2.5 %
 # Initialize the forward modelling class
 EMf = EMf_2Lay_Opt_HVP(lambd, height, offsets, freq, filt)
 
-# Create inversion
+# Define inversion framework from pygimli
 invEM = pg.Inversion()
 invEM.setForwardOperator(EMf)
 
 # Relative error array
-error = 1e-3 # introduce here the error you want to test
+error = 1e-3 # relative error 
 relativeError = np.ones_like(data[0]) * error
 model_noise_2 = np.zeros_like(model)
 
 # Start inversion
 # Perform inversion for each 1D model per position in stitched section
 for pos in range(npos):
-    model_est_pos = invEM.run(data_noise_2[pos], relativeError, verbose=False)
-    model_noise_2[pos] = model_est_pos
-    
+    model_Opt_pos = invEM.run(data_noise_2[pos], relativeError, verbose=False)
+    model_noise_2[pos] = model_Opt_pos
+
+#%%
 # Optimization Q + IP noise 5 %
 # Initialize the forward modelling class
 EMf = EMf_2Lay_Opt_HVP(lambd, height, offsets, freq, filt)
@@ -63,9 +67,10 @@ model_noise_5 = np.zeros_like(model)
 # Start inversion
 # Perform inversion for each 1D model per position in stitched section
 for pos in range(npos):
-    model_est_pos = invEM.run(data_noise_5[pos], relativeError, verbose=False)
-    model_noise_5[pos] = model_est_pos
-    
+    model_Opt_pos = invEM.run(data_noise_5[pos], relativeError, verbose=False)
+    model_noise_5[pos] = model_Opt_pos
+
+#%%
 # Optimization Q + IP noise 10 %
 # Initialize the forward modelling class
 EMf = EMf_2Lay_Opt_HVP(lambd, height, offsets, freq, filt)
@@ -79,9 +84,10 @@ model_noise_10 = np.zeros_like(model)
 # Start inversion
 # Perform inversion for each 1D model per position in stitched section
 for pos in range(npos):
-    model_est_pos = invEM.run(data_noise_10[pos], relativeError, verbose=False)
-    model_noise_10[pos] = model_est_pos
-    
+    model_Opt_pos = invEM.run(data_noise_10[pos], relativeError, verbose=False)
+    model_noise_10[pos] = model_Opt_pos
+
+#%%
 # Save estimates
 np.save('results/model_2Lay_A1_Opt_n2', model_noise_2)
 np.save('results/model_2Lay_A1_Opt_n5', model_noise_5)

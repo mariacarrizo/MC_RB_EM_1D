@@ -1,8 +1,13 @@
+# Script that performs the combined algorithm of global search + 
+# gradient based inversion for 3-layered 1D models
+
+# Import libraries
 import pygimli as pg
 import numpy as np
 import sys
 sys.path.insert(1, '../../src')
 
+# Import forward modelling class for 3-layered 1D models for GS + Opt algorithm
 from EM1D import EMf_3Lay_GSplusOpt_HVP
 
 # Import the conductivities and thicknesses used to create the LU table
@@ -19,15 +24,16 @@ filt = survey['filt']
 
 # Data array for all the 1D stitched models
 data = np.load('data/data_synth_3Lay_B1.npy')
-npos = len(data) # number of positions
+npos = len(data) # number of 1D models
 
 # Import model from Global search
 model_GS = np.load('results/model_3Lay_B1_GS.npy')
 
+#%%
 # Optimization Q + IP
 
 # Relative error array
-error = 1e-3 # introduce here the error you want to test
+error = 1e-3 # relative error
 relativeError = np.ones_like(data[0]) * error
 model_est = np.zeros_like(model_GS)
 
@@ -44,22 +50,13 @@ for pos in range(npos):
     invEM = pg.Inversion()
     invEM.setForwardOperator(EMf)
     
-    # Setting a lower boundary of conductivities 10 mS/m
+    # Setting a lower boundary of conductivities 1 mS/m
     transModel = pg.trans.TransLogLU(0.001,7) 
     invEM.modelTrans = transModel
 
     dataE = data[pos].copy()
     model_est_pos = invEM.run(dataE, relativeError, verbose=False)
     model_est[pos] = model_est_pos
-#    if (model_est[pos, (model_est[pos,0] >1)]).any():
-#        model_est[pos,0] = 1
-#    if (model_est[pos, (model_est[pos,1] >1)]).any():
-#        model_est[pos,1] = 1
-#    if (model_est[pos, (model_est[pos,2] >1)]).any():
-#        model_est[pos,2] = 1
-#    if (model_est[pos, (model_est[pos,3] >10)]).any():
-#        model_est[pos,3] = 10
-#    if (model_est[pos, (model_est[pos,3] >10)]).any():
-#        model_est[pos,4] = 10
-        
+
+# Save estimated model        
 np.save('results/model_3Lay_GSplusOpt_B1', model_est)

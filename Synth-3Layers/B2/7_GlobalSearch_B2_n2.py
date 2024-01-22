@@ -1,13 +1,10 @@
-### Code that creates searches in Lookup table for the indices of best data fit (min error)
-### 1D 3 layered model
+### Code that creates searches in Lookup table for the indices of best data fit 
+### (min data misfit) for 3-layered 1D models using noisy data 2.5%
 
 ## Import libraries
-
 import numpy as np
 import time
 from joblib import Parallel, delayed
-from itertools import product
-
 import sys
 path = '../../src'
 sys.path.insert(0, path)
@@ -15,30 +12,32 @@ sys.path.insert(0, path)
 # Import global search function
 from EM1D import GlobalSearch_3Lay
 
+# number of cores used to perform the global search
 n_workers=8
 
 # Load conductivities and thicknesses sampled
 conds = np.load('../data/conds.npy')
 thicks = np.load('../data/thicks.npy')
-nsl = len(conds)
+nsl = len(conds) # number of samples
 
 # Load lookup table
 LUT = np.load('../data/LUTable_3Lay.npy')
 
 ## Load true synthetic model and data
 data = np.load('data/data_B2_n2.npy')
-npos = len(data)
+npos = len(data) # number of 1D models
 
 # Start inversion
 print('Started searching error vector using Lookup table ...')
 startTime = time.time()
 
-model = Parallel(n_jobs=n_workers,verbose=0)(delayed(GlobalSearch_3Lay)(LUT, data[pos],
-                                                                 conds, thicks) for pos in range(npos))
+model = Parallel(n_jobs=n_workers,verbose=0)(delayed(GlobalSearch_3Lay)(LUT, 
+                    data[pos], conds, thicks) for pos in range(npos))
 
-executionTime = time.time() - startTime
-print('Execution time in seconds: ' + str(executionTime))
+executionTime = (time.time() - startTime)/60
+print('Execution time in seconds: ', f"{executionTime:.3}", ' minutes')
 
+# Store estimated model
 np.save('results/model_3Lay_B2_GS_n2', model)
 
 

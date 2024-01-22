@@ -1,11 +1,11 @@
-# Testing global search with noise case A1
+# Testing global search case A.1 with noisy data 
 
 # Import libraries
 import numpy as np
 import sys
 sys.path.insert(1, '../../src')
 
-# Load function that performs global search in lookup table
+# Import function that performs global search in lookup table for 2-layered models
 from EM1D import GlobalSearch_2Lay
 
 # Load lookup table and sampling 
@@ -13,18 +13,19 @@ LUT = np.load('../data/LUTable_2Lay.npy')
 conds = np.load('../data/conds.npy')
 thicks =  np.load('../data/thicks.npy')
 
-# Load data
-data = np.load('data/data_synth_2Lay_A1.npy')
-npos = len(data)
-
-# Load model
+# Load true model and data
 model = np.load('data/model_synth_2Lay_A1.npy')
+data = np.load('data/data_synth_2Lay_A1.npy')
 
-# Adding noise to data
+# number of 1D models
+npos = len(data) 
+
+# Creating data arrays
 data_noise_2 = data.copy()
 data_noise_5 = data.copy()
 data_noise_10 = data.copy()
 
+# Adding noise to data
 # for noise 2.5 %
 np.random.seed(1) 
 error_2 = 0.025

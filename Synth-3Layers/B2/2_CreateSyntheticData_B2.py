@@ -1,14 +1,14 @@
+# Script to create the synthetic data for 3-layered case B.2
+
 # Import libraries
 import numpy as np
-import time
-
 import sys
 sys.path.insert(1, '../../src')
 
+# Import forward function for 3-layered 1D models
 from EM1D import EMf_3Lay_HVP
 
 # Load survey details
-
 survey = np.load('../data/survey_3Lay.npy', allow_pickle=True).item()
 
 offsets = survey['offsets']
@@ -72,6 +72,7 @@ np.random.seed(9)
 error_10 = 0.05
 data_n10 *= np.random.rand(np.size(data_n10)).reshape(np.shape(data))*error_10 +1
 
+# Save noisy data
 np.save('data/data_B2_n2', data_n2)
 np.save('data/data_B2_n5', data_n5)
 np.save('data/data_B2_n10', data_n10)

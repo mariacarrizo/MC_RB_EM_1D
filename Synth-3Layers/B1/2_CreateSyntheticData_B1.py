@@ -1,10 +1,11 @@
+# Script to simulate synthetic data for case B.1
+
 # Import libraries
 import numpy as np
-import time
-
 import sys
 sys.path.insert(1, '../../src')
 
+# Import forward function for 3-layered 1D models
 from EM1D import EMf_3Lay_HVP
 
 # Load survey details
@@ -18,15 +19,15 @@ lambd = survey['lambd']
 filt = survey['filt']
 
 # Define parameters for the synthetic model
-nlayer = 3 # number of layer
+nlayer = 3 # number of layers
 npos = 20 # number of sampling positions
 
 # 3 layered conductivities
-sigmas = [20/1000, 100/1000, 20/1000] 
+sigmas = [20/1000, 100/1000, 20/1000] # in S/m
 sigmas = np.ones((npos, nlayer))*sigmas
 x = np.linspace(0, 20, npos)[:,None]
 
-#  Thicknesses
+#  Thicknesses in m
 thk1 = np.ones_like(x)*3
 thk2 = np.ones_like(x) + x/10
 
@@ -72,6 +73,7 @@ np.random.seed(9)
 error_10 = 0.05
 data_n10 *= np.random.rand(np.size(data_n10)).reshape(np.shape(data))*error_10 +1
 
+# Save noisy data
 np.save('data/data_B1_n2', data_n2)
 np.save('data/data_B1_n5', data_n5)
 np.save('data/data_B1_n10', data_n10)

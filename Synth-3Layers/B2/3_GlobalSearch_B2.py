@@ -1,13 +1,10 @@
-### Code that creates searches in Lookup table for the indices of best data fit (min error)
-### 1D 3 layered model
+### Code that creates searches in Lookup table for the indices of best data fit 
+### (min data misfit) for 3-layered 1D models
 
 ## Import libraries
-
 import numpy as np
 import time
 from joblib import Parallel, delayed
-from itertools import product
-
 import sys
 path = '../../src'
 sys.path.insert(0, path)
@@ -27,6 +24,7 @@ filt = survey['filt']
 # Normalize by offset
 norm = np.hstack((offsets, offsets, offsets, offsets, offsets, offsets))
 
+# number of cores used to perform the global search
 n_workers=8
 
 # Load conductivities and thicknesses sampled
@@ -48,12 +46,13 @@ data_norm = data[:]*norm
 print('Started searching error vector using Lookup table ...')
 startTime = time.time()
 
-model = Parallel(n_jobs=n_workers,verbose=0)(delayed(GlobalSearch_3Lay)(LUT_norm, data_norm[pos],
-                                                                 conds, thicks, norm) for pos in range(npos))
+model = Parallel(n_jobs=n_workers,verbose=0)(delayed(GlobalSearch_3Lay)(LUT_norm, 
+                data_norm[pos], conds, thicks, norm) for pos in range(npos))
 
-executionTime = time.time() - startTime
-print('Execution time in seconds: ' + str(executionTime))
+executionTime = (time.time() - startTime)/60
+print('Execution time in seconds: ', f"{executionTime:.3}", ' minutes')
 
+# Save the estimated model
 np.save('results/model_3Lay_B2_GS', model)
 
 

@@ -1,14 +1,13 @@
-# Check error space
+# Plot error space for one example of case A.2
 
 # Import libraries
 import numpy as np
-import time
 import matplotlib.pyplot as plt
 import matplotlib.tri as tri
-
 import sys
 sys.path.insert(1, '../../src')
 
+# Import functions
 from EM1D import EMf_2Lay_HVP, ErrorSpace_2Lay
 
 # Load model and data
@@ -29,7 +28,7 @@ filt = survey['filt']
 # Load estimated model from Global Search
 model_est = np.load('results/model_2Lay_A2_GS.npy')
 
-# For example let's check the following position
+# For example let's check the 1D model following position
 pos = 10
 
 # Simulate data for this position
@@ -42,7 +41,7 @@ data_est = EMf_2Lay_HVP(lambd,
                         freq = freq,
                         filt = filt)
 
-# search the error space
+# search the error space and output models with error < 0.2
 err, models_err = ErrorSpace_2Lay(LUT, data_est, 0.2, conds, thicks)
 
 # Function to plot Error space
@@ -66,7 +65,7 @@ def PlotErrorSpace(model, model_est, pos, err, models_err, depthmax=10):
     ax[0].set_xscale('log')
     ax[0].legend()
 
-    x = ((models_err[:,0])*1000) # conductivities of first layer
+    x = ((models_err[:,0])*1000) # conductivities of first layer in mS/m
     y = models_err[:,2]          # thickness of first layer
     z = err
 

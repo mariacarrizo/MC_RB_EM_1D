@@ -1,14 +1,14 @@
-# For generating 2-layered lookup table
+# For generating 2-layered lookup table for the Field case
 
 # import libraries
 import numpy as np
 from empymod import filters
 import time
 from joblib import Parallel, delayed
-
 import sys
 sys.path.insert(1, '../src')
 
+# Import forward function for 2-layered models in Field case
 from EM1D import EMf_2Lay_HV_field
 
 # Define hankel filter
@@ -16,9 +16,8 @@ filt = filters.key_201_2012()
 
 # Define EMI instrument geometry
 offsets = np.array([2, 4, 8]) # in meters
-height = 0.47 # meters height From ground surface to center of coils
-# Frequency
-freq = 9000
+height = 0.47 # meters height from ground surface to center of coils
+freq = 9000 # Frequency in Hz
 
 # Lambda numbers
 lambd = filt.base/offsets[:,np.newaxis] 
@@ -56,7 +55,6 @@ executionTime = (time.time() - startTime)
 print('Execution time in seconds: ' + str(executionTime))
 
 # Save the table, sampling and models
-
 np.save('data/LUTable_2Lay_field', LUT)
 np.save('data/conds', conds)
 np.save('data/thicks', thicks)
