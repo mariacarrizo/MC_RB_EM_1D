@@ -1,14 +1,11 @@
 # Plot Error Space in 3-layered 1D model case
 
 # Import libraries
-#import empymod
 import numpy as np
 import matplotlib.pyplot as plt
-from scipy.constants import mu_0
-import pandas as pd
-import pygimli as pg
 import copy 
 import matplotlib
+import matplotlib.tri as tri
 import sys
 sys.path.insert(1, '../../src')
 
@@ -28,7 +25,7 @@ lambd = survey['lambd']
 filt = survey['filt']
 
 model_true = np.load('data/model_synth_3Lay_B1.npy')
-model_est_FS = np.load('results/model_3Lay_B1_GS.npy')
+model_GS = np.load('results/model_3Lay_B1_GS.npy')
 
 data_true =  np.load('data/data_synth_3Lay_B1.npy')
 
@@ -41,6 +38,16 @@ sigmas_true = np.zeros((npos, nlayer))
 depths_true[:,1] = model_true[:,3]
 depths_true[:,2] = model_true[:,3] + model_true[:,4]
 sigmas_true[:,:] = model_true[:,:3]
+
+# Check error space for 1D model at position 9
+pos=9
+depthmax=10 
+
+depth_true = np.array([0, model_true[pos,3], model_true[pos,3]+model_true[pos,4],depthmax])
+depth_est = np.array([0, model_GS[pos,3], model_true[pos,3]+model_GS[pos,4], depthmax])
+
+sigma_true = np.hstack([model_true[pos,:3], model_true[pos,2]])
+sigma_est = np.hstack([model_GS[pos,:3], model_GS[pos,2]])
 
 def ErrorSpace3Lay(m_est_pos, data_true_pos, conds, thicks, max_err=0.1):
     # Evaluate only conductivity and thickness of middle layer
@@ -71,7 +78,7 @@ def ErrorSpace3Lay(m_est_pos, data_true_pos, conds, thicks, max_err=0.1):
     
     return models_below_err, err
 
-m_est_pos = model_est_FS[pos]
+m_est_pos = model_GS[pos]
 data_true_pos = data_true[pos]
 
 models_below_err, error = ErrorSpace3Lay(m_est_pos, data_true_pos, conds, thick, max_err=0.055)
@@ -167,7 +174,7 @@ def PlotErrorSpace(model, model_est, pos, err, models_err, depthmax=10):
     clb.ax.set_title('Error %', fontsize=8)
     clb.ax.tick_params(labelsize=8)
     
-PlotErrorSpace(model_true, model_est_FS, pos, error, models_below_err)
+PlotErrorSpace(model_true, model_GS, pos, error, models_below_err)
 plt.tight_layout()
 plt.show()
 

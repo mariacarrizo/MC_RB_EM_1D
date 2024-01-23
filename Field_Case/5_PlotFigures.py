@@ -31,8 +31,6 @@ elev = np.array(Dataframe['Z'])
 # Data used for the estimations
 data_true = np.array(pd.concat([Dataframe.loc[:,'H2Q':'V8Q'], 
                                       Dataframe.loc[:,'H4IP':]], axis=1))
-#data_true_line1 = np.array(Dataframe.loc[850:900,'H2Q':'V8IP'])
-#data_true_line37 = np.array(Dataframe.loc[1800,'H2Q':'V8IP'])
 
 # Load survey parameters
 survey = np.load('data/survey_field.npy', allow_pickle=True).item()
