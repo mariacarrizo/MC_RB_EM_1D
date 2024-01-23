@@ -7,14 +7,56 @@ from itertools import product
 # Functions to calculate mutual impedance ratios
 
 def Z_H(s, R_0, lambd, a, filt):
+    """ Function to calculate the mutual impedance for a horizontal
+    coplanar (H) coil orientation in a 2-layered 1D model
+    
+    Input:
+        s : coil separation in m
+        R_0 : reflection coefficient
+        lambd : radial component of the wavenumber
+        a : air layer thickness in m
+        filt : filter to perform the hankel transform
+        
+    Output:
+        Z : mutual impedance for each offset
+    
+    """
     Z = - s**3 * (np.dot((R_0*np.exp(-2*lambd*a)*lambd**2), filt.j0)/s)
     return Z
 
 def Z_V(s, R_0, lambd, a, filt):
+    """ Function to calculate the mutual impedance for a vertical
+    coplanar (V) coil orientation in a 2-layered 1D model
+    
+    Input:
+        s : coil separation in m
+        R_0 : reflection coefficient
+        lambd : radial component of the wavenumber
+        a : air layer thickness in m
+        filt : filter to perform the hankel transform
+        
+    Output:
+        Z : mutual impedance for each offset
+    
+    """
     Z = - s**2 * (np.dot((R_0*np.exp(-2*lambd*a)*lambd), filt.j1)/s)
     return Z
 
 def Z_P(s, R_0, lambd, a, filt):
+    """ Function to calculate the mutual impedance for a perpendicular
+    (P) coil orientation in a 2-layered 1D model
+    
+    Input:
+        s : coil separation in m
+        R_0 : reflection coefficient
+        lambd : radial component of the wavenumber
+        a : air layer thickness in m
+        filt : filter to perform the hankel transform
+        
+    Output:
+        Z : mutual impedance for each offset
+    
+    """
     Z = s**3 * (np.dot((R_0*np.exp(-2*lambd*a)*lambd**2),filt.j1)/s)
     return Z
 
