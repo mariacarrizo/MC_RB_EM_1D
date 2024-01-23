@@ -15,7 +15,7 @@ The repository includes:
 
 ### Installation
 1. Clone the repository
-2. Install pygimli in a separate conda environment
+2. Install `pygimli` in a separate conda environment
 Open a terminal (Linux & Mac) or the Anaconda Prompt (Windows) and type
 ```
 conda create -n pg -c gimli -c conda-forge pygimli=1.4.6
@@ -26,10 +26,12 @@ If you are using Windows or Mac, a new environment named “pg” should be visi
 conda activate pg
 ```
 For more information about pygimli instalation go to <https://www.pygimli.org/installation.html>
+
 4. Install dependencies
 ```
 pip install -r requirements.txt
 ```
+
 5. Run the codes by numeric order in each folder:
    Example: Folder Synth-2Layers:
     - 1_LUTable2Lay.py
