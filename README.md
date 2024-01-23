@@ -15,12 +15,28 @@ The repository includes:
 
 ### Installation
 1. Clone the repository
-2. Install dependencies
+2. Install pygimli in a separate conda environment
+Open a terminal (Linux & Mac) or the Anaconda Prompt (Windows) and type
+```
+conda create -n pg -c gimli -c conda-forge pygimli=1.4.6
+```
+3. Activate your environment
+If you are using Windows or Mac, a new environment named “pg” should be visible in the Anaconda Navigator. If you want to use pyGIMLi from the command line, you have to activate the environment. 
+```
+conda activate pg
+```
+For more information about pygimli instalation go to <https://www.pygimli.org/installation.html>
+4. Install dependencies
 ```
 pip install -r requirements.txt
 ```
-3. Run the codes by numeric order:
-   - 1.
+5. Run the codes by numeric order in each folder:
+   Example: Folder Synth-2Layers:
+    - 1_LUTable2Lay.py
+    - 2_CreateSyntheticData_A1.py
+    - 3_GlobalSearch_A1.py
+    - ...
+    
 ```
 ## Notes
 - Data is simulated for an EMI device with the following characteristics

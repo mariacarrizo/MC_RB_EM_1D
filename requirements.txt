@@ -1,0 +1,9 @@
+numpy
+empymod
+scipy
+joblib
+pandas
+itertools
+matplotlib
+time
+copy
