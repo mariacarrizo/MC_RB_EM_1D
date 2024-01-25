@@ -5,5 +5,3 @@ joblib
 pandas
 itertools
 matplotlib
-time
-copy
