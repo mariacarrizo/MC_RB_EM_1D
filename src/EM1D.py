@@ -492,7 +492,7 @@ def EMf_3Lay_HVP_IP(lambd, sigma1, sigma2, sigma3, h1, h2, height, offsets, freq
     
     return np.hstack((IP_h, IP_v, IP_p))
 
-def GlobalSearch_3Lay(Database, Data, conds, thicks, norm, nsl=51):
+def GlobalSearch_3Lay(Database, Data, conds, thicks, nsl=51):
     """ This function searches through the lookup table database
     for the best data fit, and then finds the corresponding model
 

@@ -21,9 +21,6 @@ freq = survey['freq']
 lambd = survey['lambd']
 filt = survey['filt']
 
-# Normalize by offset
-norm = np.hstack((offsets, offsets, offsets, offsets, offsets, offsets))
-
 # number of cores used to perform the global search
 n_workers=8
 
@@ -39,15 +36,12 @@ LUT = np.load('../data/LUTable_3Lay.npy')
 data = np.load('data/data_synth_3Lay_B2.npy')
 npos = len(data)
 
-LUT_norm = LUT[:]*norm
-data_norm = data[:]*norm
-
 # Start inversion
 print('Started searching error vector using Lookup table ...')
 startTime = time.time()
 
-model = Parallel(n_jobs=n_workers,verbose=0)(delayed(GlobalSearch_3Lay)(LUT_norm, 
-                data_norm[pos], conds, thicks, norm) for pos in range(npos))
+model = Parallel(n_jobs=n_workers,verbose=0)(delayed(GlobalSearch_3Lay)(LUT, 
+                data[pos], conds, thicks) for pos in range(npos))
 
 executionTime = (time.time() - startTime)/60
 print('Execution time in seconds: ', f"{executionTime:.3}", ' minutes')

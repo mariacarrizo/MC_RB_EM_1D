@@ -36,15 +36,12 @@ LUT = np.load('../data/LUTable_3Lay.npy')
 data = np.load('data/data_synth_3Lay_B1.npy')
 npos = len(data)
 
-# Normalize by offset
-norm = np.hstack((offsets, offsets, offsets, offsets, offsets, offsets))
-
 # Start global search inversion
 print('Started searching error vector using Lookup table ...')
 startTime = time.time()
 
 model = Parallel(n_jobs=n_workers,verbose=0)(delayed(GlobalSearch_3Lay)(LUT, 
-                data[pos], conds, thicks, norm) for pos in range(npos))
+                data[pos], conds, thicks) for pos in range(npos))
 
 executionTime = (time.time() - startTime)/60
 print('Execution time in seconds: ', f"{executionTime:.3}", ' minutes')
