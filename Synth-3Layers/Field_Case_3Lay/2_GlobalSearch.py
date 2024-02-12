@@ -8,15 +8,15 @@ import sys
 sys.path.insert(1, '../src')
 
 # Load function that performs global search in lookup table
-from EM1D import GlobalSearch_2Lay
+from EM1D import GlobalSearch_3Lay
 
 # Load lookup table and sampling 
-LUT = np.load('data/LUTable_2Lay_field.npy')
+LUT = np.load('data/LUTable_3Lay.npy')
 conds = np.load('data/conds.npy')
 thicks =  np.load('data/thicks.npy')
 
 # Load field data 
-Dataframe = pd.DataFrame(np.load('data/Field_data.npy'),
+Dataframe = pd.DataFrame(np.load('../../Field_Case/data/Field_data.npy'),
                         columns = ['X','Y','Position','Z','H2Q','H4Q','H8Q',
                                    'V2Q','V4Q','V8Q','P2Q','P4Q','P8Q',
                                    'H4IP','H8IP','V4IP','V8IP'])
@@ -35,7 +35,7 @@ print('Starting global search ...')
 
 starttime = time.time()
 for p in range(npos):
-    model_est.append(GlobalSearch_2Lay(LUT, data[p], conds, thicks, nsl=len(conds)))
+    model_est.append(GlobalSearch_3Lay(LUT, data[p], conds, thicks, nsl=len(conds)))
 endtime = time.time() - starttime
 
 print('Global search Q+IP excution for ', npos, ' positions: ', f"{(endtime/60):.3}", 'minutes')
