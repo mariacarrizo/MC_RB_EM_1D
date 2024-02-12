@@ -11,9 +11,9 @@ sys.path.insert(1, '../src')
 from EM1D import GlobalSearch_3Lay
 
 # Load lookup table and sampling 
-LUT = np.load('data/LUTable_3Lay.npy')
-conds = np.load('data/conds.npy')
-thicks =  np.load('data/thicks.npy')
+LUT = np.load('../data/LUTable_3Lay.npy')
+conds = np.load('../data/conds.npy')
+thicks =  np.load('../data/thicks.npy')
 
 # Load field data 
 Dataframe = pd.DataFrame(np.load('../../Field_Case/data/Field_data.npy'),
