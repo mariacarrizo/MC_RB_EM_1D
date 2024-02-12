@@ -3,27 +3,21 @@
 # Import libraries
 import numpy as np
 import time
-import pandas as pd
 import sys
-sys.path.insert(1, '../src')
+sys.path.insert(1, '../../src')
 
 # Load function that performs global search in lookup table
 from EM1D import GlobalSearch_3Lay
 
 # Load lookup table and sampling 
-LUT = np.load('../data/LUTable_3Lay.npy')
-conds = np.load('../data/conds.npy')
-thicks =  np.load('../data/thicks.npy')
+LUT = np.load('data/LUTable_3Lay.npy')
+conds = np.load('data/conds.npy')
+thicks =  np.load('data/thicks.npy')
 
 # Load field data 
-Dataframe = pd.DataFrame(np.load('../../Field_Case/data/Field_data.npy'),
-                        columns = ['X','Y','Position','Z','H2Q','H4Q','H8Q',
-                                   'V2Q','V4Q','V8Q','P2Q','P4Q','P8Q',
-                                   'H4IP','H8IP','V4IP','V8IP'])
-
 # Obtain H and V quadrature and in-phase measurements
 # For in-phase we only use measurements for offsets > 4 m
-data = np.array(pd.concat([Dataframe.loc[:,'H2Q':'V8Q'], Dataframe.loc[:,'H4IP':]], axis=1))
+data = np.load('data/Field_data.npy')
 
 # number of 1D models
 npos = len(data)
@@ -41,4 +35,4 @@ endtime = time.time() - starttime
 print('Global search Q+IP excution for ', npos, ' positions: ', f"{(endtime/60):.3}", 'minutes')
 
 # Save estimated models
-np.save('results/model_2Lay_GS_field', model_est)
+np.save('results/model_3Lay_GS_field', model_est)
