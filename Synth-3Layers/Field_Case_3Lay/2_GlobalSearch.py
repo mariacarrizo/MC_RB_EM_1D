@@ -10,7 +10,7 @@ sys.path.insert(1, '../../src')
 from EM1D import GlobalSearch_3Lay
 
 # Load lookup table and sampling 
-LUT = np.load('data/LUTable_3Lay.npy')
+LUT = np.load('data/LUTable_3Lay_field.npy')
 conds = np.load('data/conds.npy')
 thicks =  np.load('data/thicks.npy')
 

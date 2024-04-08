@@ -6,11 +6,11 @@ import time
 from joblib import Parallel, delayed
 from empymod import filters
 import sys
-path = '../src'
+path = '../../src'
 sys.path.insert(0, path)
 
 # Import forward function for 3-layered 1D models
-from EM1D import EMf_3Lay_HVP_field
+from EM1D import EMf_3Lay_HV_field
 
 # set here the number of workers to compute
 # if set to -1 will take all the workers available
@@ -45,7 +45,7 @@ conds = np.logspace(s0, s1, nsl)
 
 # Sampling of 1st layer thickness
 th0 = 0.1 # minimum thickness in m
-th1 = 7   # maximum thickness in m
+th1 = 6   # maximum thickness in m
 # thickness array
 thicks = np.linspace(th0, th1, nsl)
 
@@ -53,7 +53,7 @@ thicks = np.linspace(th0, th1, nsl)
 print('Start calculating Lookup table ...')
 startTime = time.time()
 
-LUT = Parallel(n_jobs=n_workers,verbose=0)(delayed(EMf_3Lay_HVP_field)(lambd, sigma1, sigma2, sigma3, h1, h2, 
+LUT = Parallel(n_jobs=n_workers,verbose=0)(delayed(EMf_3Lay_HV_field)(lambd, sigma1, sigma2, sigma3, h1, h2, 
                   height, offsets, freq, filt) for sigma1 in conds for sigma2 in conds 
                   for sigma3 in conds for h1 in thicks for h2 in thicks)
 
