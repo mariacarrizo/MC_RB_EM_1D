@@ -48,7 +48,7 @@ thicks = np.linspace(th0, th1, nsl)
 
 startTime = time.time()
 
-LUT = Parallel(n_jobs=-1,verbose=1)(delayed(EMf_2Lay_HP_field)(lambd, sigma1, sigma2, h1, 
+LUT = Parallel(n_jobs=48,verbose=1)(delayed(EMf_2Lay_HP_field)(lambd, sigma1, sigma2, h1, 
                   height, offsets, freq, filt) for sigma1 in conds for sigma2 in conds for h1 in thicks)
 
 executionTime = (time.time() - startTime)
