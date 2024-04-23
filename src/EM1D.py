@@ -242,7 +242,7 @@ def GlobalSearch_2Lay(Database, Data, conds, thicks, nsl=51):
             for k in range(len(thicks)):
                 idx = k + j*nsl + i*nsl**2
                 if indx == idx:
-                    model = np.array([conds[i], conds[j], thicks[k]])
+                    model = np.array([thicks[k], conds[i], conds[j]])
 
     return model
 
@@ -850,6 +850,43 @@ class EMf_2Lay_Opt_HV_field(pg.Modelling):
         m0 = sig_ini + thk_ini
         return np.array(m0)
     
+class EMf_2Lay_Opt_HP_field(pg.Modelling):
+    def __init__(self, lambd, height, offsets, freq, filt):
+        """ Class to Initialize the model for Gradient descent inversion
+        for the field case 2-layered models
+        
+        Input:
+            lambd : radial component of the wavenumber
+            height : height of the instrument above ground in m
+            offsets : coil separation in m
+            freq : frequency in Hertz
+            filt : filter to perform the hankel transform
+            
+        """
+        super().__init__()        
+        self.lambd = lambd
+        self.height = height
+        self.offsets = offsets
+        self.freq = freq
+        self.filt = filt
+    def response(self, m):
+        lambd = self.lambd
+        height = self.height
+        offsets = self.offsets
+        freq = self.freq
+        filt = self.filt
+        sigma1 = m[0] # electrical conductivity of the 1st layer in S/m
+        sigma2 = m[1] # electrical conductivity of the 2nd layer in S/m
+        h1 = m[2] # thickness of the 1st layer
+        # Perform the forward function
+        Z = EMf_2Lay_HP_field(lambd, sigma1, sigma2, h1, height, offsets, freq, filt)                           
+        return Z               
+    def createStartModel(self, dataVals):
+        thk_ini = [2] # m
+        sig_ini =  [100/1000, 100/1000]  # S/m
+        m0 = sig_ini + thk_ini
+        return np.array(m0)
+    
 class EMf_2Lay_GSplusOpt_HV_field(pg.Modelling):
     def __init__(self, lambd, height, offsets, freq, filt, m0):
         """ Class to Initialize the model for the combined algorithm of global
@@ -883,6 +920,59 @@ class EMf_2Lay_GSplusOpt_HV_field(pg.Modelling):
         h1 = m[2] # thickness of the 1st layer
         # Perform the forward function
         Z = EMf_2Lay_HV_field(lambd, sigma1, sigma2, h1, height, offsets, freq, filt)
+        return Z               
+    def createStartModel(self, dataVals):
+        m0 = self.m0
+        return m0
+    
+def Q_from_Sigma(sigma, s, freq=9000, mu_0=mu_0):
+    """ Function that back transforms Sigma_app to Quadrature values
+    using the LIN approximation function 
+    
+    Parameters: 
+    1. sigma: apparent conductivity [S/m]
+    2. s: coil offset [m]
+    
+    Returns:
+    Q : quadrature values
+    """
+    
+    Q = sigma * (2 *np.pi * freq) * mu_0 * s**2 /4
+    return Q
+
+class EMf_2Lay_GSplusOpt_HP_field(pg.Modelling):
+    def __init__(self, lambd, height, offsets, freq, filt, m0):
+        """ Class to Initialize the model for the combined algorithm of global
+        search plus gradient descent inversion for the field case 2-layered 
+        models
+        
+        Input:
+            lambd : radial component of the wavenumber
+            height : height of the instrument above ground in m
+            offsets : coil separation in m
+            freq : frequency in Hertz
+            filt : filter to perform the hankel transform
+            m0 : initial model coming from the global search
+            
+        """
+        super().__init__()        
+        self.lambd = lambd
+        self.height = height
+        self.offsets = offsets
+        self.freq = freq
+        self.filt = filt
+        self.m0 = m0
+    def response(self, m):
+        lambd = self.lambd
+        height = self.height
+        offsets = self.offsets
+        freq = self.freq
+        filt = self.filt
+        sigma1 = m[0] # electrical conductivity of the 1st layer in S/m
+        sigma2 = m[1] # electrical conductivity of the 2nd layer in S/m
+        h1 = m[2] # thickness of the 1st layer
+        # Perform the forward function
+        Z = EMf_2Lay_HP_field(lambd, sigma1, sigma2, h1, height, offsets, freq, filt)
         return Z               
     def createStartModel(self, dataVals):
         m0 = self.m0
