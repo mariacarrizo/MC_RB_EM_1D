@@ -246,6 +246,77 @@ def GlobalSearch_2Lay(Database, Data, conds, thicks, nsl=51):
 
     return model
 
+class EMf_2Lay_Opt_HVP_1D(pg.frameworks.Modelling):
+    
+    def __init__(self, nlay=nlay, lambd, height, offsets, freq, filt):
+        self.nlay = nlay
+        mesh = pg.meshtools.createMesh1DBlock(nlay)
+        super().__init__()
+        self.setMesh(mesh)
+        self.lambd = lambd
+        self.height = height
+        self.offsets = offsets
+        self.freq = freq
+        self.filt = filt
+        
+    def createStartModel(self, dataVals):
+
+        startThicks = 2
+        startSigma = 1/20
+        
+        # layer thickness properties
+        self.setRegionProperties(0, startModel =  startThicks, trans = 'log')
+        
+        # electrical conductivity properties
+        self.setRegionProperties(1, startModel = startSigma, trans = 'log')
+        
+        return super(FDEM1DModelling, self).createStartModel()
+    
+    def response(self, par):
+        """ Compute response vector for a certain model [mod] 
+        par = [thickness_1, thickness_2, ..., thickness_n, sigma_1, sigma_2, ..., sigma_n]
+        """
+        resp = EMf_2Lay_HVP(lambd = self.lambd,
+                            sigma1 = np.asarray(par)[1], 
+                            sigma2 = np.asarray(par)[2], 
+                            h1 = np.asarray(par)[0], 
+                            height = self.height, 
+                            offsets = self.offsets, 
+                            freq = self.freq, 
+                            filt = self.filt
+                              )
+        return resp
+    
+    def response_mt(self, par, i=0):
+        """Multi-threaded forward response."""
+        return self.response(par)
+    
+    def createJacobian(self, par, dx=1e-4):
+        """ compute Jacobian for a 1D model """
+        resp = self.response(par)
+        n_rows = len(resp) # number of data values in data vector
+        n_cols = len(par) # number of model parameters
+        J = self.jacobian() # we define first this as the jacobian
+        J.resize(n_rows, n_cols)
+        Jt = np.zeros((n_cols, n_rows))
+        for j in range(n_cols):
+            mod_plus_dx = par.copy()
+            mod_plus_dx[j] += dx
+            Jt[j,:] = (self.response(mod_plus_dx) - resp)/dx # J.T in col j
+        for i in range(n_rows):
+            J[i] = Jt[:,i]
+        #print(self.jacobian())
+        #print(J)
+        #print(Jt)
+        
+    def drawModel(self, ax, model):
+        pg.viewer.mpl.drawModel1D(ax = ax,
+                                  model = model,
+                                  plot = 'semilogx',
+                                  xlabel = 'Electrical conductivity (S/m)',
+                                  )
+        ax.set_ylabel('Depth in (m)')
+
 class EMf_2Lay_Opt_HVP(pg.Modelling):
     def __init__(self, lambd, height, offsets, freq, filt):
         """ Class to Initialize the model for Gradient descent inversion
