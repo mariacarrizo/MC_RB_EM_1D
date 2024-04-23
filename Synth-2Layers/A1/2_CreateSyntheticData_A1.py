@@ -1,4 +1,7 @@
-""" add date and author """
+""" 
+Author: @mariacarrizo
+Date created: 15/12/2023
+"""
 
 # File to create synthetic models in case A.1
 
@@ -39,10 +42,10 @@ x = np.linspace(0, 20, npos) # Horizontal positions array
 h_1 = 3 + x/10 +.25 # Thicknesses of first layer h_1 in meters
 
 # Create true model in each position
-model_A1_1 = np.stack((sigmas_A1_1[:,0], sigmas_A1_1[:,1], h_1), axis=1)
-model_A1_2 = np.stack((sigmas_A1_2[:,0], sigmas_A1_2[:,1], h_1), axis=1)
-model_A1_3 = np.stack((sigmas_A1_3[:,0], sigmas_A1_3[:,1], h_1), axis=1)
-model_A1_4 = np.stack((sigmas_A1_4[:,0], sigmas_A1_4[:,1], h_1), axis=1)
+model_A1_1 = np.stack((h_1, sigmas_A1_1[:,0], sigmas_A1_1[:,1]), axis=1)
+model_A1_2 = np.stack((h_1, sigmas_A1_2[:,0], sigmas_A1_2[:,1]), axis=1)
+model_A1_3 = np.stack((h_1, sigmas_A1_3[:,0], sigmas_A1_3[:,1]), axis=1)
+model_A1_4 = np.stack((h_1, sigmas_A1_4[:,0], sigmas_A1_4[:,1]), axis=1)
 
 # Create empty array for true data in each position
 data_A1_1 = []
@@ -100,7 +103,7 @@ np.save('data/data_synth_2Lay_A1_2', data_A1_2)
 np.save('data/data_synth_2Lay_A1_3', data_A1_3)
 np.save('data/data_synth_2Lay_A1_4', data_A1_4)
 
-np.save('data/model_synth_2Lay_A1_1', model_A1_1)
-np.save('data/model_synth_2Lay_A1_2', model_A1_2)
-np.save('data/model_synth_2Lay_A1_3', model_A1_3)
-np.save('data/model_synth_2Lay_A1_4', model_A1_4)
+np.save('models/model_synth_2Lay_A1_1', model_A1_1)
+np.save('models/model_synth_2Lay_A1_2', model_A1_2)
+np.save('models/model_synth_2Lay_A1_3', model_A1_3)
+np.save('models/model_synth_2Lay_A1_4', model_A1_4)
