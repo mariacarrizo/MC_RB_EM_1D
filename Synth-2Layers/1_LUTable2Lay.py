@@ -32,7 +32,7 @@ survey = {'offsets': offsets,
 np.save('data/survey_2Lay.npy', survey)
 
 # sampling of conductivities
-nsl = 71 # number of samples
+nsl = 101 # number of samples
 s0 = -2 # minimum conductivity in S/m
 s1 = 0.3 # maximum conductivity in S/m
 # conductivities array
