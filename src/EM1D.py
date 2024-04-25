@@ -227,7 +227,6 @@ def GlobalSearch_2Lay(Database, Data, conds, thicks, nsl=51):
 
     err = 1
     indx = 0
-    model = []
 
     # Search best data fit
     for i in range(np.shape(Database)[0]):
