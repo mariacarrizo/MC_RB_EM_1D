@@ -227,6 +227,7 @@ def GlobalSearch_2Lay(Database, Data, conds, thicks, nsl=51):
 
     err = 1
     indx = 0
+    model = []
 
     # Search best data fit
     for i in range(np.shape(Database)[0]):
@@ -248,7 +249,7 @@ def GlobalSearch_2Lay(Database, Data, conds, thicks, nsl=51):
 
 class EMf_2Lay_Opt_HVP_1D(pg.frameworks.Modelling):
     
-    def __init__(self, nlay=nlay, lambd, height, offsets, freq, filt):
+    def __init__(self, lambd, height, offsets, freq, filt, nlay):
         self.nlay = nlay
         mesh = pg.meshtools.createMesh1DBlock(nlay)
         super().__init__()
