@@ -33,7 +33,7 @@ model_A1_4 = np.load('models/model_synth_2Lay_A1_4.npy')
 
 # number of 1D models
 npos = len(data_A1_1)
-nsl = 121
+nsl = len(conds)
 
 # Estimate with both Quadrature and In Phase
 model_GS_A1_1 = np.zeros_like(model_A1_1) # Empty array for estimated model

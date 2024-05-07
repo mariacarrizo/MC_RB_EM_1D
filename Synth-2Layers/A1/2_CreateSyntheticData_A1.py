@@ -39,7 +39,7 @@ sigmas_A1_3 = np.ones((npos, nlayer))*sig_ini_A1_3 # conductivity array
 sigmas_A1_4 = np.ones((npos, nlayer))*sig_ini_A1_4 # conductivity array
 
 x = np.linspace(0, 20, npos) # Horizontal positions array
-h_1 = 3 + x/10 +.25 # Thicknesses of first layer h_1 in meters
+h_1 = 2 + x/10 +.25 # Thicknesses of first layer h_1 in meters
 
 # Create true model in each position
 model_A1_1 = np.stack((h_1, sigmas_A1_1[:,0], sigmas_A1_1[:,1]), axis=1)
