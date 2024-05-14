@@ -37,15 +37,15 @@ survey = {'offsets': offsets,
 np.save('data/survey_3Lay.npy', survey)
 
 # sampling of conductivities
-nsl = 51 # number of samples
-s0 = -3 # minimum conductivity in S/m
-s1 = -0.5 # maximum conductivity in S/m
+nsl = 61 # number of samples
+s0 = -2 # minimum conductivity in S/m
+s1 = 0.3 # maximum conductivity in S/m
 # conductivities array
 conds = np.logspace(s0, s1, nsl)
 
 # Sampling of 1st layer thickness
 th0 = 0.1 # minimum thickness in m
-th1 = 7   # maximum thickness in m
+th1 = 5   # maximum thickness in m
 # thickness array
 thicks = np.linspace(th0, th1, nsl)
 
