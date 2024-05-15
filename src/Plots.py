@@ -111,9 +111,12 @@ def showStitchedModels(models, ax=None, x=None, cMin=None, cMax=None, thk=None,
 
     if title is not None:
         ax.set_title(title)
+        
+    if 'orientation' in kwargs:
+        orientation = kwargs['orientation']
 
     if kwargs.pop('colorBar', True):
-        cb = pg.viewer.mpl.createColorBar(p, cMin=cMin, cMax=cMax, nLevs=5)
+        cb = pg.viewer.mpl.createColorBar(p, cMin=cMin, cMax=cMax, nLevs=5, orientation=orientation)
 #    cb = plt.colorbar(p, orientation='horizontal',aspect=50,pad=0.1)
         if 'cticks' in kwargs:
             xt = np.unique(np.clip(kwargs['cticks'], cMin, cMax))
