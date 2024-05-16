@@ -45,7 +45,7 @@ print('Estimating model B1-1 using Q+IP')
 # Initialize the forward modelling class 
 EMf = EMf_3Lay_Opt_HVP_1D(lambd, height, offsets, freq, filt, nlay=3)
 
-transThk = pg.trans.TransLogLU(0.1,7)
+transThk = pg.trans.TransLogLU(1.5,5.5)
 transSig = pg.trans.TransLogLU(10/1000,2000/1000)
 
 # Define transformation
@@ -79,7 +79,7 @@ print('Estimating model B1-1 using Q')
 # Initialize the forward modelling class 
 EMf = EMf_3Lay_Opt_HVP_Q_1D(lambd, height, offsets, freq, filt, nlay=3)
 
-transThk = pg.trans.TransLogLU(0.1,7)
+transThk = pg.trans.TransLogLU(1.5,5.5)
 transSig = pg.trans.TransLogLU(10/1000,2000/1000)
 
 # Define transformation
@@ -113,7 +113,7 @@ print('Estimating model B1-1 using IP')
 # Initialize the forward modelling class 
 EMf = EMf_3Lay_Opt_HVP_IP_1D(lambd, height, offsets, freq, filt, nlay=3)
 
-transThk = pg.trans.TransLogLU(0.1,7)
+transThk = pg.trans.TransLogLU(1.5,5.5)
 transSig = pg.trans.TransLogLU(10/1000,2000/1000)
 
 # Define transformation
@@ -147,7 +147,7 @@ print('Estimating model B1-2 using Q+IP')
 # Initialize the forward modelling class 
 EMf = EMf_3Lay_Opt_HVP_1D(lambd, height, offsets, freq, filt, nlay=3)
 
-transThk = pg.trans.TransLogLU(0.1,7)
+transThk = pg.trans.TransLogLU(1.5,5.5)
 transSig = pg.trans.TransLogLU(10/1000,2000/1000)
 
 # Define transformation
@@ -181,7 +181,7 @@ print('Estimating model B1-2 using Q')
 # Initialize the forward modelling class 
 EMf = EMf_3Lay_Opt_HVP_Q_1D(lambd, height, offsets, freq, filt, nlay=3)
 
-transThk = pg.trans.TransLogLU(0.1,7)
+transThk = pg.trans.TransLogLU(1.5,5.5)
 transSig = pg.trans.TransLogLU(10/1000,2000/1000)
 
 # Define transformation
@@ -215,7 +215,7 @@ print('Estimating model B1-2 using IP')
 # Initialize the forward modelling class 
 EMf = EMf_3Lay_Opt_HVP_IP_1D(lambd, height, offsets, freq, filt, nlay=3)
 
-transThk = pg.trans.TransLogLU(0.1,7)
+transThk = pg.trans.TransLogLU(1.5,5.5)
 transSig = pg.trans.TransLogLU(10/1000,2000/1000)
 
 # Define transformation
@@ -249,7 +249,7 @@ print('Estimating model B1-3 using Q+IP')
 # Initialize the forward modelling class 
 EMf = EMf_3Lay_Opt_HVP_1D(lambd, height, offsets, freq, filt, nlay=3)
 
-transThk = pg.trans.TransLogLU(0.1,7)
+transThk = pg.trans.TransLogLU(1.5,5.5)
 transSig = pg.trans.TransLogLU(10/1000,2000/1000)
 
 # Define transformation
@@ -283,7 +283,7 @@ print('Estimating model B1-3 using Q')
 # Initialize the forward modelling class 
 EMf = EMf_3Lay_Opt_HVP_Q_1D(lambd, height, offsets, freq, filt, nlay=3)
 
-transThk = pg.trans.TransLogLU(0.1,7)
+transThk = pg.trans.TransLogLU(1.5,5.5)
 transSig = pg.trans.TransLogLU(10/1000,2000/1000)
 
 # Define transformation
@@ -317,7 +317,7 @@ print('Estimating model B1-3 using IP')
 # Initialize the forward modelling class 
 EMf = EMf_3Lay_Opt_HVP_IP_1D(lambd, height, offsets, freq, filt, nlay=3)
 
-transThk = pg.trans.TransLogLU(0.1,7)
+transThk = pg.trans.TransLogLU(1.5,5.5)
 transSig = pg.trans.TransLogLU(10/1000,2000/1000)
 
 # Define transformation
@@ -351,7 +351,7 @@ print('Estimating model B1-4 using Q+IP')
 # Initialize the forward modelling class 
 EMf = EMf_3Lay_Opt_HVP_1D(lambd, height, offsets, freq, filt, nlay=3)
 
-transThk = pg.trans.TransLogLU(0.1,7)
+transThk = pg.trans.TransLogLU(1.5,5.5)
 transSig = pg.trans.TransLogLU(10/1000,2000/1000)
 
 # Define transformation
@@ -385,7 +385,7 @@ print('Estimating model B1-4 using Q')
 # Initialize the forward modelling class 
 EMf = EMf_3Lay_Opt_HVP_Q_1D(lambd, height, offsets, freq, filt, nlay=3)
 
-transThk = pg.trans.TransLogLU(0.1,7)
+transThk = pg.trans.TransLogLU(1.5,5.5)
 transSig = pg.trans.TransLogLU(10/1000,2000/1000)
 
 # Define transformation
@@ -419,7 +419,7 @@ print('Estimating model B1-4 using IP')
 # Initialize the forward modelling class 
 EMf = EMf_3Lay_Opt_HVP_IP_1D(lambd, height, offsets, freq, filt, nlay=3)
 
-transThk = pg.trans.TransLogLU(0.1,7)
+transThk = pg.trans.TransLogLU(1.5,5.5)
 transSig = pg.trans.TransLogLU(10/1000,2000/1000)
 
 # Define transformation
