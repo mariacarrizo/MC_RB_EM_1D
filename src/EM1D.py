@@ -949,7 +949,7 @@ def GlobalSearch_3Lay(Database, Data, conds, thicks, nsl=51):
     5. nsl: number of samples
 
     Returns: 3 layered model estimated through best data fit
-    model = [sigma_1, sigma_2, sigma_3, h_1, h_2]
+    model = [h_1, h_2, sigma_1, sigma_2, sigma_3]
 
     Units:
     sigma_1 [S/m]
@@ -973,8 +973,7 @@ def GlobalSearch_3Lay(Database, Data, conds, thicks, nsl=51):
     m_idx = Indices[indx_min_rmse]
     
     # Estimated model from global search
-    model = np.array([conds[m_idx[0]], conds[m_idx[1]], conds[m_idx[2]], 
-                      thicks[m_idx[3]], thicks[m_idx[4]]])
+    model = np.array([thicks[m_idx[3]], thicks[m_idx[4]], conds[m_idx[0]], conds[m_idx[1]], conds[m_idx[2]]])
     
     return model
 
