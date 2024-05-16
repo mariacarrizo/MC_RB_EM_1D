@@ -22,7 +22,7 @@ lambd = survey['lambd']
 filt = survey['filt']
 
 # Number of cores used to perform global search
-n_workers=48
+n_workers=6
 
 # Load conductivities and thicknesses sampled
 conds = np.load('../data/conds.npy')

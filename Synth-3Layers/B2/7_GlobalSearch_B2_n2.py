@@ -13,7 +13,7 @@ sys.path.insert(0, path)
 from EM1D import GlobalSearch_3Lay
 
 # Number of cores used to perform global search
-n_workers=48
+n_workers=6
 
 # Load conductivities and thicknesses sampled
 conds = np.load('../data/conds.npy')
@@ -69,8 +69,8 @@ executionTime = (time.time() - startTime)/60
 print('Execution time: ', f"{executionTime:.3}", ' minutes')
 
 # Save estimated model
-np.save('results/model_GS_n2_B2_1', model_n2_B1_1)
-np.save('results/model_GS_n2_B2_2', model_n2_B1_2)
-np.save('results/model_GS_n2_B2_3', model_n2_B1_3)
-np.save('results/model_GS_n2_B2_4', model_n2_B1_4)
+np.save('results/model_GS_n2_B2_1', model_n2_B2_1)
+np.save('results/model_GS_n2_B2_2', model_n2_B2_2)
+np.save('results/model_GS_n2_B2_3', model_n2_B2_3)
+np.save('results/model_GS_n2_B2_4', model_n2_B2_4)
 
