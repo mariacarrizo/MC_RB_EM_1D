@@ -33,7 +33,7 @@ data_B1_3 = np.load('data/data_synth_B1_3.npy')
 data_B1_4 = np.load('data/data_synth_B1_4.npy')
 
 # number of 1D models 
-npos = len(data) 
+npos = len(data_B1_1) 
 
 # Load data with added noise
 data_n2_B1_1 = np.load('data/data_n2_B1_1.npy')
@@ -77,7 +77,7 @@ invEM.setForwardOperator(EMf) # set forward operator
 # Relative error array
 error = 1e-3 # relative error
 relativeError = np.ones_like(data_n2_B1_1[0]) * error
-model_Opt_n2_B1_1 = np.zeros_like(model)
+model_Opt_n2_B1_1 = np.zeros_like(model_B1_1)
 
 # Start inversion
 print('Run inversion')
@@ -108,7 +108,7 @@ invEM.setForwardOperator(EMf) # set forward operator
 # Relative error array
 error = 1e-3 # relative error
 relativeError = np.ones_like(data_n2_B1_2[0]) * error
-model_Opt_n2_B1_2 = np.zeros_like(model)
+model_Opt_n2_B1_2 = np.zeros_like(model_B1_2)
 
 # Start inversion
 print('Run inversion')
@@ -139,7 +139,7 @@ invEM.setForwardOperator(EMf) # set forward operator
 # Relative error array
 error = 1e-3 # relative error
 relativeError = np.ones_like(data_n2_B1_3[0]) * error
-model_Opt_n2_B1_3 = np.zeros_like(model)
+model_Opt_n2_B1_3 = np.zeros_like(model_B1_3)
 
 # Start inversion
 print('Run inversion')
@@ -170,7 +170,7 @@ invEM.setForwardOperator(EMf) # set forward operator
 # Relative error array
 error = 1e-3 # relative error
 relativeError = np.ones_like(data_n2_B1_4[0]) * error
-model_Opt_n2_B1_4 = np.zeros_like(model)
+model_Opt_n2_B1_4 = np.zeros_like(model_B1_4)
 
 # Start inversion
 print('Run inversion')
@@ -202,7 +202,7 @@ invEM.setForwardOperator(EMf) # set forward operator
 # Relative error array
 error = 1e-3 # relative error
 relativeError = np.ones_like(data_n5_B1_1[0]) * error
-model_Opt_n5_B1_1 = np.zeros_like(model)
+model_Opt_n5_B1_1 = np.zeros_like(model_B1_1)
 
 # Start inversion
 print('Run inversion')
@@ -233,7 +233,7 @@ invEM.setForwardOperator(EMf) # set forward operator
 # Relative error array
 error = 1e-3 # relative error
 relativeError = np.ones_like(data_n5_B1_2[0]) * error
-model_Opt_n5_B1_2 = np.zeros_like(model)
+model_Opt_n5_B1_2 = np.zeros_like(model_B1_2)
 
 # Start inversion
 print('Run inversion')
@@ -264,7 +264,7 @@ invEM.setForwardOperator(EMf) # set forward operator
 # Relative error array
 error = 1e-3 # relative error
 relativeError = np.ones_like(data_n5_B1_3[0]) * error
-model_Opt_n5_B1_3 = np.zeros_like(model)
+model_Opt_n5_B1_3 = np.zeros_like(model_B1_3)
 
 # Start inversion
 print('Run inversion')
@@ -295,7 +295,7 @@ invEM.setForwardOperator(EMf) # set forward operator
 # Relative error array
 error = 1e-3 # relative error
 relativeError = np.ones_like(data_n5_B1_4[0]) * error
-model_Opt_n5_B1_4 = np.zeros_like(model)
+model_Opt_n5_B1_4 = np.zeros_like(model_B1_4)
 
 # Start inversion
 print('Run inversion')
@@ -327,7 +327,7 @@ invEM.setForwardOperator(EMf) # set forward operator
 # Relative error array
 error = 1e-3 # relative error
 relativeError = np.ones_like(data_n10_B1_1[0]) * error
-model_Opt_n10_B1_1 = np.zeros_like(model)
+model_Opt_n10_B1_1 = np.zeros_like(model_B1_1)
 
 # Start inversion
 print('Run inversion')
@@ -358,7 +358,7 @@ invEM.setForwardOperator(EMf) # set forward operator
 # Relative error array
 error = 1e-3 # relative error
 relativeError = np.ones_like(data_n10_B1_2[0]) * error
-model_Opt_n10_B1_2 = np.zeros_like(model)
+model_Opt_n10_B1_2 = np.zeros_like(model_B1_2)
 
 # Start inversion
 print('Run inversion')
@@ -389,7 +389,7 @@ invEM.setForwardOperator(EMf) # set forward operator
 # Relative error array
 error = 1e-3 # relative error
 relativeError = np.ones_like(data_n10_B1_3[0]) * error
-model_Opt_n10_B1_3 = np.zeros_like(model)
+model_Opt_n10_B1_3 = np.zeros_like(model_B1_3)
 
 # Start inversion
 print('Run inversion')
@@ -420,7 +420,7 @@ invEM.setForwardOperator(EMf) # set forward operator
 # Relative error array
 error = 1e-3 # relative error
 relativeError = np.ones_like(data_n10_B1_4[0]) * error
-model_Opt_n10_B1_4 = np.zeros_like(model)
+model_Opt_n10_B1_4 = np.zeros_like(model_B1_4)
 
 # Start inversion
 print('Run inversion')

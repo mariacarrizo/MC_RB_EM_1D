@@ -13,7 +13,7 @@ sys.path.insert(0, path)
 from EM1D import GlobalSearch_3Lay
 
 # Number of cores used to perform global search
-n_workers=48
+n_workers=5
 
 # Load conductivities and thicknesses sampled
 conds = np.load('../data/conds.npy')
@@ -29,7 +29,7 @@ data_n10_B1_2 = np.load('data/data_n10_B1_2.npy')
 data_n10_B1_3 = np.load('data/data_n10_B1_3.npy')
 data_n10_B1_4 = np.load('data/data_n10_B1_4.npy')
 
-npos = len(data_n2_B1_1) # number of 1D models
+npos = len(data_n10_B1_1) # number of 1D models
 
 # Start inversion
 print('Started global search B1-1 ...')

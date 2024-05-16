@@ -13,7 +13,7 @@ sys.path.insert(0, path)
 from EM1D import GlobalSearch_3Lay
 
 # Number of cores used to perform global search
-n_workers=48
+n_workers=5
 
 # Load conductivities and thicknesses sampled
 conds = np.load('../data/conds.npy')
