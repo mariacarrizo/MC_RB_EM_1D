@@ -54,16 +54,16 @@ data_n10_B1_4 = np.load('data/data_n10_B1_4.npy')
 #%%
 # Optimization for data [Q + IP] noise 2.5 %
 # Initialize the forward modelling class
-m0 = [3, 3, 500/1000, 500/1000, 500/1000]
+m0 = [3, 3, 100/1000, 100/1000, 100/1000]
 lam = 0
+
+transThk = pg.trans.TransLogLU(1,4)
+transSig = pg.trans.TransLogLU(10/1000,2000/1000)
 
 ## Case A1-1
 print('Estimating model n2 B1-1')
 # Initialize the forward modelling class 
 EMf = EMf_3Lay_Opt_HVP_1D(lambd, height, offsets, freq, filt, nlay=3)
-
-transThk = pg.trans.TransLogLU(0.1,7)
-transSig = pg.trans.TransLogLU(10/1000,2000/1000)
 
 # Define transformation
 EMf.region(0).setTransModel(transThk)
@@ -93,9 +93,6 @@ print('Estimating model n2 B1-2')
 # Initialize the forward modelling class 
 EMf = EMf_3Lay_Opt_HVP_1D(lambd, height, offsets, freq, filt, nlay=3)
 
-transThk = pg.trans.TransLogLU(0.1,7)
-transSig = pg.trans.TransLogLU(10/1000,2000/1000)
-
 # Define transformation
 EMf.region(0).setTransModel(transThk)
 EMf.region(1).setTransModel(transSig)
@@ -124,9 +121,6 @@ print('Estimating model n2 B1-3')
 # Initialize the forward modelling class 
 EMf = EMf_3Lay_Opt_HVP_1D(lambd, height, offsets, freq, filt, nlay=3)
 
-transThk = pg.trans.TransLogLU(0.1,7)
-transSig = pg.trans.TransLogLU(10/1000,2000/1000)
-
 # Define transformation
 EMf.region(0).setTransModel(transThk)
 EMf.region(1).setTransModel(transSig)
@@ -154,9 +148,6 @@ np.save('results/model_Opt_n2_B1_3', model_Opt_n2_B1_3)
 print('Estimating model n2 B1-4')
 # Initialize the forward modelling class 
 EMf = EMf_3Lay_Opt_HVP_1D(lambd, height, offsets, freq, filt, nlay=3)
-
-transThk = pg.trans.TransLogLU(0.1,7)
-transSig = pg.trans.TransLogLU(10/1000,2000/1000)
 
 # Define transformation
 EMf.region(0).setTransModel(transThk)
@@ -187,9 +178,6 @@ print('Estimating model n5 B1-1')
 # Initialize the forward modelling class 
 EMf = EMf_3Lay_Opt_HVP_1D(lambd, height, offsets, freq, filt, nlay=3)
 
-transThk = pg.trans.TransLogLU(0.1,7)
-transSig = pg.trans.TransLogLU(10/1000,2000/1000)
-
 # Define transformation
 EMf.region(0).setTransModel(transThk)
 EMf.region(1).setTransModel(transSig)
@@ -217,9 +205,6 @@ np.save('results/model_Opt_n5_B1_1', model_Opt_n5_B1_1)
 print('Estimating model n5 B1-2')
 # Initialize the forward modelling class 
 EMf = EMf_3Lay_Opt_HVP_1D(lambd, height, offsets, freq, filt, nlay=3)
-
-transThk = pg.trans.TransLogLU(0.1,7)
-transSig = pg.trans.TransLogLU(10/1000,2000/1000)
 
 # Define transformation
 EMf.region(0).setTransModel(transThk)
@@ -249,9 +234,6 @@ print('Estimating model n5 B1-3')
 # Initialize the forward modelling class 
 EMf = EMf_3Lay_Opt_HVP_1D(lambd, height, offsets, freq, filt, nlay=3)
 
-transThk = pg.trans.TransLogLU(0.1,7)
-transSig = pg.trans.TransLogLU(10/1000,2000/1000)
-
 # Define transformation
 EMf.region(0).setTransModel(transThk)
 EMf.region(1).setTransModel(transSig)
@@ -279,9 +261,6 @@ np.save('results/model_Opt_n5_B1_3', model_Opt_n5_B1_3)
 print('Estimating model n5 B1-4')
 # Initialize the forward modelling class 
 EMf = EMf_3Lay_Opt_HVP_1D(lambd, height, offsets, freq, filt, nlay=3)
-
-transThk = pg.trans.TransLogLU(0.1,7)
-transSig = pg.trans.TransLogLU(10/1000,2000/1000)
 
 # Define transformation
 EMf.region(0).setTransModel(transThk)
@@ -312,9 +291,6 @@ print('Estimating model n10 B1-1')
 # Initialize the forward modelling class 
 EMf = EMf_3Lay_Opt_HVP_1D(lambd, height, offsets, freq, filt, nlay=3)
 
-transThk = pg.trans.TransLogLU(0.1,7)
-transSig = pg.trans.TransLogLU(10/1000,2000/1000)
-
 # Define transformation
 EMf.region(0).setTransModel(transThk)
 EMf.region(1).setTransModel(transSig)
@@ -342,9 +318,6 @@ np.save('results/model_Opt_n10_B1_1', model_Opt_n10_B1_1)
 print('Estimating model n10 B1-2')
 # Initialize the forward modelling class 
 EMf = EMf_3Lay_Opt_HVP_1D(lambd, height, offsets, freq, filt, nlay=3)
-
-transThk = pg.trans.TransLogLU(0.1,7)
-transSig = pg.trans.TransLogLU(10/1000,2000/1000)
 
 # Define transformation
 EMf.region(0).setTransModel(transThk)
@@ -374,9 +347,6 @@ print('Estimating model n10 B1-3')
 # Initialize the forward modelling class 
 EMf = EMf_3Lay_Opt_HVP_1D(lambd, height, offsets, freq, filt, nlay=3)
 
-transThk = pg.trans.TransLogLU(0.1,7)
-transSig = pg.trans.TransLogLU(10/1000,2000/1000)
-
 # Define transformation
 EMf.region(0).setTransModel(transThk)
 EMf.region(1).setTransModel(transSig)
@@ -404,9 +374,6 @@ np.save('results/model_Opt_n10_B1_3', model_Opt_n10_B1_3)
 print('Estimating model n10 B1-4')
 # Initialize the forward modelling class 
 EMf = EMf_3Lay_Opt_HVP_1D(lambd, height, offsets, freq, filt, nlay=3)
-
-transThk = pg.trans.TransLogLU(0.1,7)
-transSig = pg.trans.TransLogLU(10/1000,2000/1000)
 
 # Define transformation
 EMf.region(0).setTransModel(transThk)
