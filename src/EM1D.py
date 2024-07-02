@@ -12,6 +12,7 @@ import numpy as np
 from scipy.constants import mu_0
 import pygimli as pg
 from itertools import product
+from sklearn.metrics import root_mean_squared_error
 
 #%%
 
