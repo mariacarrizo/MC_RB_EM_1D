@@ -9,7 +9,7 @@ import sys
 sys.path.insert(1, '../src')
 
 # Import forward modelling class for GS + Opt algorithm in Field Case
-from EM1D import EMf_2Lay_GSplusOpt_HV_field
+from EM1D import EMf_2Lay_Opt_HV_field
 
 # Import the conductivities and thicknesses used to create the LU table
 conds = np.load('data/conds.npy')
@@ -45,6 +45,11 @@ error = 1e-3 # relative error
 relativeError = np.ones_like(data[0]) * error
 model_est = np.zeros((npos, nlay+1))
 
+lam = 0
+
+transThk = pg.trans.TransLogLU(np.min(thick), np.max(thick))
+transSig = pg.trans.TransLogLU(np.min(conds), np.max(conds))
+
 # Start inversion
 # Perform inversion for each 1D model per position in stitched section
 for pos in range(npos):
@@ -52,18 +57,17 @@ for pos in range(npos):
     m0 = model_GS[pos]
     
     # Initialize the forward modelling class
-    EMf = EMf_2Lay_GSplusOpt_HV_field(lambd, height, offsets, freq, filt, m0)
+    EMf = EMf_2Lay_Opt_HV_field(lambd, height, offsets, freq, filt, nlay=2)
+
+    EMf.region(0).setTransModel(transThk)
+    EMf.region(1).setTransModel(transSig)
 
     # Create inversion
     invEM = pg.Inversion()
     invEM.setForwardOperator(EMf)
-    
-    # Setting a lower boundary of conductivities 10 mS/m
-    transModel = pg.trans.TransLogLU(0.01,6) 
-    invEM.modelTrans = transModel
 
     dataE = data[pos].copy()
-    model_est[pos] = invEM.run(dataE, relativeError, verbose=False)
+    model_est[pos] = invEM.run(dataE, relativeError, startModel= m0, lam=lam, verbose=False)
     
 # Save estimated model
-np.save('results/model_2Lay_GSplusOpt_field', model_est)
+np.save('results/model_2Lay_GSGN_field', model_est)
