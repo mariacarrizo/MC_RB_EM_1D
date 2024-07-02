@@ -189,6 +189,7 @@ def grid(model, depthmax=8, ny=101, nlay=2):
     return grid
 
 def plot_Data(data_true, data_est, ax, legen=False, ylab=False, ylabel = 'Q', xlab=False, fs=7):
+    """ Function to plot data fit"""
 
     ax.semilogy(data_true[:,0], 'b', label='H2 true')
     ax.semilogy(data_true[:,1], '--b', label='H4 true')
@@ -212,10 +213,233 @@ def plot_Data(data_true, data_est, ax, legen=False, ylab=False, ylabel = 'Q', xl
     
     if legen == True:
         ax.legend(bbox_to_anchor=(1, 1.05), fontsize=7)
-        #ax.legend(fontsize=7, loc='upper right')
     
     if ylab == True:
         ax.set_ylabel(ylabel+' [PPT]', fontsize=fs)
     
     if xlab == True:
         ax.set_xlabel('Distance [m]', fontsize=fs)
+        
+def Plot1DModel(model, depths, ax=None, model_name=None, model_style='k', ylab=False, xlab=False, lw=1):
+    """ Function to plot a 1D model"""
+    if ax is None:
+        fig, ax = plt.subplots()
+    fs=7
+    ax.step(model, depths, model_style, label=model_name, linewidth=lw)
+    ax.set_xscale('log')
+    if xlab == True:
+        ax.set_xlabel('$\sigma$ [mS/m]', fontsize=fs)
+    if ylab == True:
+        ax.set_ylabel('Depth [m]', fontsize=fs)
+    if model_name is not None:
+        ax.legend(fontsize=fs)
+    ax.tick_params(labelsize=fs)
+    plt.tight_layout()
+    
+    
+def Plot_Noise_Analysis(models_noise, model_true, model_est, dmax=-8, ax=None, xlab=False, ylab=False):
+    """ Function to plot Noise Analysis for 2-Layered case
+    models_noise : models estimated in Noise Analysis
+    model_true : true model
+    model_est : estimated model without noise
+    dmax : maximum depth for plot
+    ax : axis
+    ylab : y axis label
+    xlab : x axis label
+    """
+    if ax is None:
+        fig, ax = plt.subplots()
+    fs=7
+    for m in range(len(models_noise)):
+        mod = models_noise[m]
+        sigma_2Lay_plot = np.hstack((mod[1:], mod[-1]))
+        depths_2Lay_plot = np.array([0, -mod[0], dmax])
+        Plot1DModel(sigma_2Lay_plot, depths_2Lay_plot, ax=ax, model_style='paleturquoise')
+    
+    sigma_true = np.hstack((model_true[1:], model_true[-1]))
+    depth_true = np.array([0, -model_true[0], dmax])
+    Plot1DModel(sigma_true, depth_true, model_name='True', ax=ax, lw=4)
+    
+    sigma_est = np.hstack((model_est[1:], model_est[-1]))
+    depth_est = np.array([0, -model_est[0], dmax])
+    Plot1DModel(sigma_est, depth_est, model_name='Est', ax=ax, model_style='r', ylab=ylab, xlab=xlab)
+    
+# Function to plot Solution space for a fixed sigma1
+def Plot_SolSpa_sigma1(ax1, ax2, model, model_GS, model_GN, model_ini, model_hist,
+                       err, models_err, xmin=100, xmax=2000, ymin=0, ymax=7, case='', title='Solution Space', 
+                       depthmax=-8, colorbar=True):
+    """
+    Plotting function of the solution space for a fixed sigma1
+    
+    ax1 : axis to plot the 1D model
+    ax2 : axis to plot the solution space
+    model : true model
+    model_GS : model estimated GS
+    model_GN : model estimated GN
+    model_ini : initial model for Gauss-Newton inversion
+    model_hist : update history of Gauss-Newton inversion
+    err : nrmse values of the solution space
+    models_err : models sampled in the solution space
+    xmin : minimum x value for solution space plot in mS/m
+    xmax : maximum x value for solution space plot in mS/m
+    ymin : minimum y value for solution space plot in m
+    ymax : maximum y value for solution space plot in m
+    
+    """
+    # Depths to plot 1D models
+    depth_true = np.array([0, -model[0], depthmax])
+    depth_GS = np.array([0, -model_GS[0], depthmax])
+    depth_GN = np.array([0, -model_GN[0], depthmax])
+    depth_ini = np.array([0, -model_ini[0], depthmax])
+
+    # Sigmas to plot 1D models in mS/m
+    sigma_true = np.hstack([model[1:], model[-1]])*1000
+    sigma_GS = np.hstack([model_GS[1:], model_GS[-1]])*1000
+    sigma_GN = np.hstack([model_GN[1:], model_GN[-1]])*1000
+    sigma_ini = np.hstack([model_ini[1:], model_ini[-1]])*1000
+    
+    # Plot 1D models
+    ax1.step(sigma_true, depth_true, 'k', label = 'True', linewidth=4)
+    ax1.step(sigma_GS, depth_GS, 'r', label='GS')
+    ax1.step(sigma_Opt, depth_Opt, 'c', label='GI')
+    ax1.step(sigma_ini, depth_ini, 'g', label='Initial')
+    ax1.set_xlim([10,2000])
+    ax1.set_ylabel('Depth [m]', fontsize=8)
+    ax1.set_xlabel('$\sigma$ [mS/m]', fontsize=8)
+    ax1.set_title('1D Model X=' +str(pos) + 'm - '+case, fontsize=8)
+    ax1.set_xscale('log')
+    ax1.legend(fontsize=7)
+    ax1.tick_params(axis='both',labelsize=9)
+
+    # Solution space values
+    x = ((models_err[:,2])*1000) # conductivities of second layer in mS/m
+    y = models_err[:,0]          # thicknesses of first layer
+    z = err                      # nrmse values
+
+    ngridx = 100
+    ngridy = 200
+    
+    # Create grid values first.
+    xi = np.linspace(np.min(x), np.max(x), ngridx)
+    yi = np.linspace(np.min(y), np.max(y), ngridy)
+
+    # Linearly interpolate the data (x, y) on a grid defined by (xi, yi).
+    triang = tri.Triangulation(x, y)
+    interpolator = tri.LinearTriInterpolator(triang, z)
+    Xi, Yi = np.meshgrid(xi, yi)
+    zi = interpolator(Xi, Yi)
+
+    # Plot solution space
+    ax2.contour(xi, yi, zi*100, levels=15, linewidths=0.5, colors='k', )
+    cntr1 = ax2.contourf(xi, yi, zi*100, levels=15, cmap="RdBu_r", vmin=0, vmax=40)
+    ax2.set(xlim=(xmin, xmax), ylim=(ymin, ymax))
+    ax2.scatter(model[2]*1000, model[0], marker='o', c='w', label='True model', s=100)
+    ax2.scatter(model_GS[2]*1000, model_GS[0], marker ='x', c='r', label='GS', s=100)
+    ax2.scatter(model_Opt[2]*1000, model_Opt[0], marker ='.', c='y', label='GN', s=100)
+    ax2.scatter(model_ini[2]*1000, model_ini[0], marker ='.', c='k', label='Initial', s=100)
+    # Plot update path
+    for i in range(len(model_hist)+1):
+        x = model_hist[i-1:i+1,2]*1000
+        y = model_hist[i-1:i+1,0]
+        ax2.plot(x,y, ':k')
+    ax2.set_xlabel('$\sigma_2$ [mS/m]', fontsize=8)
+    ax2.set_ylabel('$h_1$ [m]', fontsize=8)
+    ax2.legend(fontsize=7)
+    ax2.tick_params(axis='both',labelsize=9)
+    ax2.set_title(method, fontsize=8)
+    ax2.set_xscale('log')
+    
+    if colorbar==True:
+        clb = fig.colorbar(cntr1, ax=ax2, ticks=[0, 10, 20, 30, 40])
+        clb.ax.set_title('NRMSE %', fontsize=7)
+        clb.ax.tick_params(labelsize=9)
+    
+# Function to plot Solution space for a fixed sigma2
+def Plot_SolSpa_sigma2(ax1, ax2, model, model_GS, model_GN, model_ini, model_hist,
+                       err, models_err, xmin=10, xmax=600, ymin=0, ymax=7, case='', title='Solution Space', 
+                       depthmax=-8, colorbar=True):
+    """
+    Plotting function of the solution space for a fixed sigma2
+    
+    ax1 : axis to plot the 1D model
+    ax2 : axis to plot the solution space
+    model : true model
+    model_GS : model estimated GS
+    model_GN : model estimated GN
+    model_ini : initial model for Gauss-Newton inversion
+    model_hist : update history of Gauss-Newton inversion
+    err : nrmse values of the solution space
+    models_err : models sampled in the solution space
+    xmin : minimum x value for solution space plot in mS/m
+    xmax : maximum x value for solution space plot in mS/m
+    ymin : minimum y value for solution space plot in m
+    ymax : maximum y value for solution space plot in m
+    
+    """
+    # Depths to plot 1D models
+    depth_true = np.array([0, -model[0], depthmax])
+    depth_GS = np.array([0, -model_GS[0], depthmax])
+    depth_GN = np.array([0, -model_GN[0], depthmax])
+    depth_ini = np.array([0, -model_ini[0], depthmax])
+
+    # Sigmas to plot 1D models in mS/m
+    sigma_true = np.hstack([model[1:], model[-1]])*1000
+    sigma_GS = np.hstack([model_GS[1:], model_GS[-1]])*1000
+    sigma_GN = np.hstack([model_GN[1:], model_GN[-1]])*1000
+    sigma_ini = np.hstack([model_ini[1:], model_ini[-1]])*1000
+    
+    # Plot 1D models
+    ax1.step(sigma_true, depth_true, 'k', label = 'True', linewidth=4)
+    ax1.step(sigma_GS, depth_GS, 'r', label='GS')
+    ax1.step(sigma_Opt, depth_Opt, 'c', label='GI')
+    ax1.step(sigma_ini, depth_ini, 'g', label='Initial')
+    ax1.set_xlim([10,2000])
+    ax1.set_ylabel('Depth [m]', fontsize=8)
+    ax1.set_xlabel('$\sigma$ [mS/m]', fontsize=8)
+    ax1.set_title('1D Model X=' +str(pos) + 'm - '+case, fontsize=8)
+    ax1.set_xscale('log')
+    ax1.legend(fontsize=7)
+    ax1.tick_params(axis='both',labelsize=9)
+
+    # Solution space
+    x = ((models_err[:,1])*1000) # conductivities of first layer in mS/m
+    y = models_err[:,0]          # thicknesses of first layer in m
+    z = err                      # nrmse values
+
+    ngridx = 100
+    ngridy = 200
+    
+    # Create grid values first.
+    xi = np.linspace(np.min(x), np.max(x), ngridx)
+    yi = np.linspace(np.min(y), np.max(y), ngridy)
+
+    # Linearly interpolate the data (x, y) on a grid defined by (xi, yi).
+    triang = tri.Triangulation(x, y)
+    interpolator = tri.LinearTriInterpolator(triang, z)
+    Xi, Yi = np.meshgrid(xi, yi)
+    zi = interpolator(Xi, Yi)
+
+    # Plot solution space
+    ax2.contour(xi, yi, zi*100, levels=15, linewidths=0.5, colors='k', )
+    cntr1 = ax2.contourf(xi, yi, zi*100, levels=15, cmap="RdBu_r", vmin=0, vmax=40)
+    ax2.set(xlim=(xmin, xmax), ylim=(ymin, ymax))
+    ax2.scatter(model[1]*1000, model[0], marker='o', c='w', label='True model', s=100)
+    ax2.scatter(model_GS[1]*1000, model_GS[0], marker ='x', c='r', label='GS', s=100)
+    ax2.scatter(model_Opt[1]*1000, model_Opt[0], marker ='.', c='y', label='GN', s=100)
+    ax2.scatter(model_ini[1]*1000, model_ini[0], marker ='.', c='k', label='Initial', s=100)
+    # Plot update history
+    for i in range(len(model_hist)+1):
+        x = model_hist[i-1:i+1,1]*1000
+        y = model_hist[i-1:i+1,0]
+        ax2.plot(x,y, ':k')
+    ax2.set_xlabel('$\sigma_1$ [mS/m]', fontsize=8)
+    ax2.set_ylabel('$h_1$ [m]', fontsize=8)
+    ax2.legend(fontsize=7)
+    ax2.tick_params(axis='both',labelsize=9)
+    ax2.set_title(method, fontsize=8)
+    ax2.set_xscale('log')
+    
+    if colorbar==True:
+        clb = fig.colorbar(cntr1, ax=ax2, ticks=[0, 10, 20, 30, 40])
+        clb.ax.set_title('NRMSE %', fontsize=7)
+        clb.ax.tick_params(labelsize=9)
