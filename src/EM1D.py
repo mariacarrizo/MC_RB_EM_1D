@@ -1,3 +1,13 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Script Name: EM1D.py
+Description: This script contains the Forward Functions and Inversion classes
+Author: Maria Carrizo
+Email: mecarrizomasca@tudelft.nl
+Date created: 15/12/2023
+"""
+
 import numpy as np
 from scipy.constants import mu_0
 import pygimli as pg
@@ -363,10 +373,80 @@ class EMf_3Lay_Opt_HVP_1D(pg.frameworks.Modelling):
                                   xlabel = 'Electrical conductivity (S/m)',
                                   )
         ax.set_ylabel('Depth in (m)')
-        
-class EMf_2Lay_Opt_HVP_Q_1D(pg.frameworks.Modelling):
+
+class EMf_3Lay_Opt_HV_1D(pg.frameworks.Modelling):
     
     def __init__(self, lambd, height, offsets, freq, filt, nlay):
+        self.nlay = nlay
+        mesh = pg.meshtools.createMesh1DBlock(nlay)
+        super().__init__()
+        self.setMesh(mesh)
+        self.lambd = lambd
+        self.height = height
+        self.offsets = offsets
+        self.freq = freq
+        self.filt = filt
+    
+    def response(self, par):
+        """ Compute response vector for a certain model [mod] 
+        par = [thickness_1, thickness_2, ..., thickness_n, sigma_1, sigma_2, ..., sigma_n]
+        """
+        resp = EMf_3Lay_HV_field(lambd = self.lambd,
+                            sigma1 = np.asarray(par)[2], 
+                            sigma2 = np.asarray(par)[3],
+                            sigma3 = np.asarray(par)[4],
+                            h1 = np.asarray(par)[0], 
+                            h2 = np.asarray(par)[1],
+                            height = self.height, 
+                            offsets = self.offsets, 
+                            freq = self.freq, 
+                            filt = self.filt
+                              )
+        return resp
+    
+    def response_mt(self, par, i=0):
+        """Multi-threaded forward response."""
+        return self.response(par)
+    
+    def createJacobian(self, par, dx=1e-4):
+        """ compute Jacobian for a 1D model """
+        resp = self.response(par)
+        n_rows = len(resp) # number of data values in data vector
+        n_cols = len(par) # number of model parameters
+        J = self.jacobian() # we define first this as the jacobian
+        J.resize(n_rows, n_cols)
+        Jt = np.zeros((n_cols, n_rows))
+        for j in range(n_cols):
+            mod_plus_dx = par.copy()
+            mod_plus_dx[j] += dx
+            Jt[j,:] = (self.response(mod_plus_dx) - resp)/dx # J.T in col j
+        for i in range(n_rows):
+            J[i] = Jt[:,i]
+        #print(self.jacobian())
+        #print(J)
+        #print(Jt)
+        
+    def drawModel(self, ax, model):
+        pg.viewer.mpl.drawModel1D(ax = ax,
+                                  model = model,
+                                  plot = 'semilogx',
+                                  xlabel = 'Electrical conductivity (S/m)',
+                                  )
+        ax.set_ylabel('Depth in (m)')
+        
+class EMf_2Lay_Opt_HVP_Q_1D(pg.frameworks.Modelling):
+    """ Class to Initialize the model for Gauss-Newton inversion
+    using the quadrature (Q) and in-phase (IP) components of the measurements
+    
+    Input:
+        lambd : radial component of the wavenumber
+        height : height of the instrument above ground in m
+        offsets : coil separation in m
+        freq : frequency in Hertz
+        filt : filter to perform the hankel transform
+        nlay : number of layers
+    """
+    def __init__(self, lambd, height, offsets, freq, filt, nlay=2):
         self.nlay = nlay
         mesh = pg.meshtools.createMesh1DBlock(nlay)
         super().__init__()
@@ -423,8 +503,18 @@ class EMf_2Lay_Opt_HVP_Q_1D(pg.frameworks.Modelling):
         ax.set_ylabel('Depth in (m)')
         
 class EMf_3Lay_Opt_HVP_Q_1D(pg.frameworks.Modelling):
+    """ Class to Initialize the model for Gauss-Newton inversion
+    using the quadrature (Q) component of the measurements
     
-    def __init__(self, lambd, height, offsets, freq, filt, nlay):
+    Input:
+        lambd : radial component of the wavenumber
+        height : height of the instrument above ground in m
+        offsets : coil separation in m
+        freq : frequency in Hertz
+        filt : filter to perform the hankel transform
+        nlay : number of layers
+    """
+    def __init__(self, lambd, height, offsets, freq, filt, nlay=2):
         self.nlay = nlay
         mesh = pg.meshtools.createMesh1DBlock(nlay)
         super().__init__()
@@ -483,8 +573,18 @@ class EMf_3Lay_Opt_HVP_Q_1D(pg.frameworks.Modelling):
         ax.set_ylabel('Depth in (m)')
         
 class EMf_2Lay_Opt_HVP_IP_1D(pg.frameworks.Modelling):
+    """ Class to Initialize the model for Gauss-Newton inversion
+    using the in-phase (IP) component of the measurements
     
-    def __init__(self, lambd, height, offsets, freq, filt, nlay):
+    Input:
+        lambd : radial component of the wavenumber
+        height : height of the instrument above ground in m
+        offsets : coil separation in m
+        freq : frequency in Hertz
+        filt : filter to perform the hankel transform
+        nlay : number of layers
+    """
+    def __init__(self, lambd, height, offsets, freq, filt, nlay=2):
         self.nlay = nlay
         mesh = pg.meshtools.createMesh1DBlock(nlay)
         super().__init__()
@@ -541,8 +641,18 @@ class EMf_2Lay_Opt_HVP_IP_1D(pg.frameworks.Modelling):
         ax.set_ylabel('Depth in (m)')
         
 class EMf_3Lay_Opt_HVP_IP_1D(pg.frameworks.Modelling):
+    """ Class to Initialize the model for Gauss-Newton inversion
+    using the quadrature (Q) and in-phase (IP) components of the measurements
     
-    def __init__(self, lambd, height, offsets, freq, filt, nlay):
+    Input:
+        lambd : radial component of the wavenumber
+        height : height of the instrument above ground in m
+        offsets : coil separation in m
+        freq : frequency in Hertz
+        filt : filter to perform the hankel transform
+        nlay : number of layers
+    """
+    def __init__(self, lambd, height, offsets, freq, filt, nlay=3):
         self.nlay = nlay
         mesh = pg.meshtools.createMesh1DBlock(nlay)
         super().__init__()
@@ -977,161 +1087,8 @@ def GlobalSearch_3Lay(Database, Data, conds, thicks, nsl=51):
     
     return model
 
-class EMf_3Lay_Opt_HVP(pg.Modelling):
-    def __init__(self, lambd, height, offsets, freq, filt):
-        """ Class to Initialize the model for Gradient descent inversion
-        using the quadrature (Q) and in-phase (IP) components of the measurements
-        
-        Input:
-            lambd : radial component of the wavenumber
-            height : height of the instrument above ground in m
-            offsets : coil separation in m
-            freq : frequency in Hertz
-            filt : filter to perform the hankel transform
-        """
-        super().__init__()        
-        self.lambd = lambd
-        self.height = height
-        self.offsets = offsets
-        self.freq = freq
-        self.filt = filt
-    def response(self, m):
-        lambd = self.lambd
-        height = self.height
-        offsets = self.offsets
-        freq = self.freq
-        filt = self.filt
-        sigma1 = m[0] # electrical conductivity of the 1st layer in S/m
-        sigma2 = m[1] # electrical conductivity of the 2nd layer in S/m
-        sigma3 = m[2] # electrical conductivity of the 3rd layer in S/m
-        h1 = m[3] # thickness of 1st layer in m
-        h2 = m[4] # thickness of 2nd layer in m
-        # Perform forward function
-        Z = EMf_3Lay_HVP(lambd, sigma1, sigma2, sigma3, h1, h2, height, offsets, freq, filt)
-        return Z               
-    def createStartModel(self, dataVals):
-        thk_ini = [2,2] # Thicknesses in m
-        sig_ini =  [50/1000, 50/1000, 50/1000] # conductivities in S/m
-        m0 = sig_ini + thk_ini
-        return np.array(m0)
-    
-class EMf_3Lay_Opt_HVP_Q(pg.Modelling):
-    def __init__(self, lambd, height, offsets, freq, filt):
-        """ Class to Initialize the model for Gradient descent inversion
-        using the quadrature (Q) component of the measurements
-        
-        Input:
-            lambd : radial component of the wavenumber
-            height : height of the instrument above ground in m
-            offsets : coil separation in m
-            freq : frequency in Hertz
-            filt : filter to perform the hankel transform
-        
-        """
-        super().__init__()        
-        self.lambd = lambd
-        self.height = height
-        self.offsets = offsets
-        self.freq = freq
-        self.filt = filt
-    def response(self, m):
-        lambd = self.lambd
-        height = self.height
-        offsets = self.offsets
-        freq = self.freq
-        filt = self.filt
-        sigma1 = m[0] # electrical conductivity of the 1st layer in S/m
-        sigma2 = m[1] # electrical conductivity of the 2nd layer in S/m
-        sigma3 = m[2] # electrical conductivity of the 3rd layer in S/m
-        h1 = m[3] # thickness of 1st layer in m
-        h2 = m[4] # thickness of 2nd layer in m
-        # Perform forward function
-        Z = EMf_3Lay_HVP_Q(lambd, sigma1, sigma2, sigma3, h1, h2, height, offsets, freq, filt)
-        return Z               
-    def createStartModel(self, dataVals):
-        thk_ini = [2,2] # Thicknesses in m
-        sig_ini =  [50/1000, 50/1000, 50/1000] # conductivities in S/m
-        m0 = sig_ini + thk_ini
-        return np.array(m0)
-    
-class EMf_3Lay_Opt_HVP_IP(pg.Modelling):
-    def __init__(self, lambd, height, offsets, freq, filt):
-        """ Class to Initialize the model for Gradient descent inversion
-        using the In-Phase (IP) component of the measurements
-        
-        Input:
-            lambd : radial component of the wavenumber
-            height : height of the instrument above ground in m
-            offsets : coil separation in m
-            freq : frequency in Hertz
-            filt : filter to perform the hankel transform
-        
-        """
-        super().__init__()        
-        self.lambd = lambd
-        self.height = height
-        self.offsets = offsets
-        self.freq = freq
-        self.filt = filt
-    def response(self, m):
-        lambd = self.lambd
-        height = self.height
-        offsets = self.offsets
-        freq = self.freq
-        filt = self.filt
-        sigma1 = m[0] # electrical conductivity of the 1st layer in S/m
-        sigma2 = m[1] # electrical conductivity of the 2nd layer in S/m
-        sigma3 = m[2] # electrical conductivity of the 3rd layer in S/m
-        h1 = m[3] # thickness of 1st layer in m
-        h2 = m[4] # thickness of 2nd layer in m
-        # Perform forward function
-        Z = EMf_3Lay_HVP_IP(lambd, sigma1, sigma2, sigma3, h1, h2, height, offsets, freq, filt)
-        return Z               
-    def createStartModel(self, dataVals):
-        thk_ini = [2,2] # Thicknesses in m
-        sig_ini =  [50/1000, 50/1000, 50/1000] # conductivities in S/m
-        m0 = sig_ini + thk_ini
-        return np.array(m0)
-    
-class EMf_3Lay_GSplusOpt_HVP(pg.Modelling):
-    def __init__(self, lambd, height, offsets, freq, filt, m0):
-        """ Class to Initialize the model for the combined algorithm of global
-        search + gradient based inversion 
-        
-        Input:
-            lambd : radial component of the wavenumber
-            height : height of the instrument above ground in m
-            offsets : coil separation in m
-            freq : frequency in Hertz
-            filt : filter to perform the hankel transform
-            m0 : initial model from global search
-        
-        """
-        super().__init__()        
-        self.lambd = lambd
-        self.height = height
-        self.offsets = offsets
-        self.freq = freq
-        self.filt = filt
-        self.m0 = m0 # initial model from global search
-    def response(self, m):
-        lambd = self.lambd
-        height = self.height
-        offsets = self.offsets
-        freq = self.freq
-        filt = self.filt
-        sigma1 = m[0] # electrical conductivity of the 1st layer in S/m
-        sigma2 = m[1] # electrical conductivity of the 2nd layer in S/m
-        sigma3 = m[2] # electrical conductivity of the 3rd layer in S/m
-        h1 = m[3] # thickness of 1st layer in m
-        h2 = m[4] # thickness of 2nd layer in m
-        # Perform forward function
-        Z = EMf_3Lay_HVP(lambd, sigma1, sigma2, sigma3, h1, h2, height, offsets, freq, filt)
-        return Z               
-    def createStartModel(self, dataVals):
-        m0 = self.m0
-        return m0
-    
+  
+   
 def EMf_2Lay_HV_field(lambd, sigma1, sigma2, h1, height, offsets, freq, filt):
     """ Forward function for a 2-layered earth model in field case
     
@@ -1167,41 +1124,61 @@ def EMf_2Lay_HV_field(lambd, sigma1, sigma2, h1, height, offsets, freq, filt):
 
 
 class EMf_2Lay_Opt_HV_field(pg.Modelling):
-    def __init__(self, lambd, height, offsets, freq, filt):
-        """ Class to Initialize the model for Gradient descent inversion
-        for the field case 2-layered models
-        
-        Input:
-            lambd : radial component of the wavenumber
-            height : height of the instrument above ground in m
-            offsets : coil separation in m
-            freq : frequency in Hertz
-            filt : filter to perform the hankel transform
-            
-        """
-        super().__init__()        
+    def __init__(self, lambd, height, offsets, freq, filt, nlay):
+        self.nlay = nlay
+        mesh = pg.meshtools.createMesh1DBlock(nlay)
+        super().__init__()
+        self.setMesh(mesh)
         self.lambd = lambd
         self.height = height
         self.offsets = offsets
         self.freq = freq
         self.filt = filt
-    def response(self, m):
-        lambd = self.lambd
-        height = self.height
-        offsets = self.offsets
-        freq = self.freq
-        filt = self.filt
-        sigma1 = m[0] # electrical conductivity of the 1st layer in S/m
-        sigma2 = m[1] # electrical conductivity of the 2nd layer in S/m
-        h1 = m[2] # thickness of the 1st layer
-        # Perform the forward function
-        Z = EMf_2Lay_HV_field(lambd, sigma1, sigma2, h1, height, offsets, freq, filt)                           
-        return Z               
-    def createStartModel(self, dataVals):
-        thk_ini = [2] # m
-        sig_ini =  [100/1000, 100/1000]  # S/m
-        m0 = sig_ini + thk_ini
-        return np.array(m0)
+            
+    def response(self, par):
+        """ Compute response vector for a certain model [mod] 
+        par = [thickness_1, thickness_2, ..., thickness_n, sigma_1, sigma_2, ..., sigma_n]
+        """
+        resp = EMf_2Lay_HV_field(lambd = self.lambd,
+                            sigma1 = np.asarray(par)[1], 
+                            sigma2 = np.asarray(par)[2], 
+                            h1 = np.asarray(par)[0], 
+                            height = self.height, 
+                            offsets = self.offsets, 
+                            freq = self.freq, 
+                            filt = self.filt
+                              )
+        return resp
+    
+    def response_mt(self, par, i=0):
+        """Multi-threaded forward response."""
+        return self.response(par)
+    
+    def createJacobian(self, par, dx=1e-4):
+        """ compute Jacobian for a 1D model """
+        resp = self.response(par)
+        n_rows = len(resp) # number of data values in data vector
+        n_cols = len(par) # number of model parameters
+        J = self.jacobian() # we define first this as the jacobian
+        J.resize(n_rows, n_cols)
+        Jt = np.zeros((n_cols, n_rows))
+        for j in range(n_cols):
+            mod_plus_dx = par.copy()
+            mod_plus_dx[j] += dx
+            Jt[j,:] = (self.response(mod_plus_dx) - resp)/dx # J.T in col j
+        for i in range(n_rows):
+            J[i] = Jt[:,i]
+        #print(self.jacobian())
+        #print(J)
+        #print(Jt)
+        
+    def drawModel(self, ax, model):
+        pg.viewer.mpl.drawModel1D(ax = ax,
+                                  model = model,
+                                  plot = 'semilogx',
+                                  xlabel = 'Electrical conductivity (S/m)',
+                                  )
+        ax.set_ylabel('Depth in (m)')
     
 class EMf_2Lay_Opt_HP_field(pg.Modelling):
     def __init__(self, lambd, height, offsets, freq, filt):
