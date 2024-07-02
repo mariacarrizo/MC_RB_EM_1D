@@ -116,14 +116,16 @@ def showStitchedModels(models, ax=None, x=None, cMin=None, cMax=None, thk=None,
         orientation = kwargs['orientation']
 
     if kwargs.pop('colorBar', True):
-        cb = pg.viewer.mpl.createColorBar(p, cMin=cMin, cMax=cMax, nLevs=5, orientation=orientation)
-#    cb = plt.colorbar(p, orientation='horizontal',aspect=50,pad=0.1)
+    #    cb = pg.viewer.mpl.createColorBar(p, cMin=cMin, cMax=cMax, nLevs=5, orientation=orientation)
+        cb = plt.colorbar(p, orientation='vertical') #,aspect=50,pad=0.1)
         if 'cticks' in kwargs:
             xt = np.unique(np.clip(kwargs['cticks'], cMin, cMax))
             cb.set_ticks(xt)
             cb.set_ticklabels([str(xti) for xti in xt])
+            
         if 'label' in kwargs:
-            cb.set_label(kwargs['label'])
+            cb.set_label(kwargs['label'], fontsize=8)
+            cb.ax.tick_params(labelsize=7)
 
     plt.draw()
     return ax  # maybe return cb as well?
