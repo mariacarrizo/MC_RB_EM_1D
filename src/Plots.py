@@ -1,4 +1,13 @@
-"""Model viewer functions."""
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+""" 
+Script Name: Plots.py
+Description: Script with model and data visualization functions 
+Author: @mariacarrizo
+Email: mecarrizomasca@tudelft.nl
+Date created: 18/12/2023
+"""
+
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
@@ -129,3 +138,84 @@ def showStitchedModels(models, ax=None, x=None, cMin=None, cMax=None, thk=None,
 
     plt.draw()
     return ax  # maybe return cb as well?
+
+def grid(model, depthmax=8, ny=101, nlay=2):
+    """ Generates a grid from the model to plot a 2D section
+    """
+    # Arrays for plotting
+    npos = np.shape(model)[0] # number of 1D models
+   # ny = 101 # size of the grid in y direction
+    y = np.linspace(0, depthmax, ny) # y axis [m]
+    grid = np.zeros((npos, ny)) # empty grid
+    thk = model[:,:nlay-1].copy() # define electrical conductivities
+    sig = model[:,nlay-1:].copy()  # define thicknesses
+    
+    # Fill the grid with the conductivity values
+    
+    if nlay == 3:
+        for i in range(npos):
+            y1 = 0
+            # First layer
+            while y[y1] < thk[i,0]:
+                grid[i, y1] = sig[i, 0]
+                y1 += 1
+                if y1 > ny-1:
+                    break
+                #y2 = y1
+            # Second layer
+            while y[y1] < (thk[i,0] + thk[i,1]):
+                grid[i, y1] = sig[i, 1]
+                y1 += 1
+                if y1 > ny-1:
+                    break
+            # Third layer
+            grid[i, y1:] = sig[i, 2]
+    
+    if nlay == 2:   
+        for i in range(npos):
+            y1 = 0
+            # First layer
+            while y[y1] < thk[i,0]:
+                grid[i, y1] = sig[i, 0]
+                y1 += 1
+                if y1 > ny-1:
+                    break
+            while y[y1] >= thk[i,0]:
+                grid[i, y1] = sig[i, 1]
+                y1 += 1
+                if y1 > ny-1:
+                    break
+        
+    return grid
+
+def plot_Data(data_true, data_est, ax, legen=False, ylab=False, ylabel = 'Q', xlab=False, fs=7):
+
+    ax.semilogy(data_true[:,0], 'b', label='H2 true')
+    ax.semilogy(data_true[:,1], '--b', label='H4 true')
+    ax.semilogy(data_true[:,2], ':b', label='H8 true')
+    ax.semilogy(data_true[:,3], 'k', label='V2 true')
+    ax.semilogy(data_true[:,4], '--k', label='V4 true')
+    ax.semilogy(data_true[:,5], ':k', label='V8 true')
+    ax.semilogy(data_true[:,6], 'r', label='P2 true')
+    ax.semilogy(data_true[:,7], '--r', label='P4 true')
+    ax.semilogy(data_true[:,8], ':r', label='P8 true')
+
+    ax.semilogy(data_est[:,0], '.b', label='H2 est')
+    ax.semilogy(data_est[:,1], 'xb', label='H4 est')
+    ax.semilogy(data_est[:,2], '^b', label='H8 est')
+    ax.semilogy(data_est[:,3], '.k', label='V2 est')
+    ax.semilogy(data_est[:,4], 'xk', label='V4 est')
+    ax.semilogy(data_est[:,5], '^k', label='V8 est')
+    ax.semilogy(data_est[:,6], '.r', label='P2 est')
+    ax.semilogy(data_est[:,7], 'xr', label='P4 est')
+    ax.semilogy(data_est[:,8], '^r', label='P8 est')
+    
+    if legen == True:
+        ax.legend(bbox_to_anchor=(1, 1.05), fontsize=7)
+        #ax.legend(fontsize=7, loc='upper right')
+    
+    if ylab == True:
+        ax.set_ylabel(ylabel+' [PPT]', fontsize=fs)
+    
+    if xlab == True:
+        ax.set_xlabel('Distance [m]', fontsize=fs)
