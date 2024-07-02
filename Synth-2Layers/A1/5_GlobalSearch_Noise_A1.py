@@ -1,4 +1,10 @@
-# Testing global search case A.1 with noisy data 
+""" 
+Script Name: 5_GlobalSearch_Noise_A1.py
+Description: Script to test global search in A1 cases with noisy data 
+Author: @mariacarrizo
+Email: mecarrizomasca@tudelft.nl
+Date created: 18/12/2023
+"""
 
 # Import libraries
 import numpy as np
@@ -24,8 +30,10 @@ model_A1_2 = np.load('models/model_synth_2Lay_A1_2.npy')
 model_A1_3 = np.load('models/model_synth_2Lay_A1_3.npy')
 model_A1_4 = np.load('models/model_synth_2Lay_A1_4.npy')
 
-# number of 1D models
+# number of 1D models positions
 npos = len(data_A1_1)
+
+# sampling number in lookup table
 nsl = len(conds)
 
 # Creating model and data arrays

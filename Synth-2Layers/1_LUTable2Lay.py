@@ -1,6 +1,14 @@
-# Script for generating 2-layered lookup table
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Script Name: 1_LUTable2Lay.py
+Description: Script for generating 2-layered lookup table
+Author: @mariacarrizo
+Email: mecarrizomasca@tudelft.nl
+Date created: 15/12/2023
+"""
 
-# import libraries
+# Import libraries
 import numpy as np
 from empymod import filters
 import time
@@ -48,7 +56,7 @@ h_1 = np.linspace(th0, th1, nsl)
 print('Start generating Lookup table for 2-layered models')
 startTime = time.time()
 
-DataEM = Parallel(n_jobs=-1,verbose=1)(delayed(EMf_2Lay_HVP)(lambd, sigma1, sigma2, h1, 
+DataEM = Parallel(n_jobs=8,verbose=1)(delayed(EMf_2Lay_HVP)(lambd, sigma1, sigma2, h1, 
                   height, offsets, freq, filt) for sigma1 in conds for sigma2 in conds for h1 in h_1)
 
 executionTime = ((time.time() - startTime))/60
