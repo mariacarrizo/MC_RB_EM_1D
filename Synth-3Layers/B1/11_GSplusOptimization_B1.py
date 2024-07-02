@@ -8,7 +8,7 @@ import sys
 sys.path.insert(1, '../../src')
 
 # Import forward modelling class for 3-layered 1D models for GS + Opt algorithm
-from EM1D import EMf_3Lay_GSplusOpt_HVP
+from EM1D import EMf_3Lay_Opt_HVP_1D
 
 # Import the conductivities and thicknesses used to create the LU table
 conds = np.load('../data/conds.npy')
@@ -23,40 +23,142 @@ lambd = survey['lambd']
 filt = survey['filt']
 
 # Data array for all the 1D stitched models
-data = np.load('data/data_synth_3Lay_B1.npy')
-npos = len(data) # number of 1D models
+data_B1_1 = np.load('data/data_synth_B1_1.npy')
+data_B1_2 = np.load('data/data_synth_B1_2.npy')
+data_B1_3 = np.load('data/data_synth_B1_3.npy')
+data_B1_4 = np.load('data/data_synth_B1_4.npy')
+
+npos = len(data_B1_1) # number of 1D models
 
 # Import model from Global search
-model_GS = np.load('results/model_3Lay_B1_GS.npy')
+model_GS_B1_1 = np.load('results/model_GS_B1_1.npy')
+model_GS_B1_2 = np.load('results/model_GS_B1_2.npy')
+model_GS_B1_3 = np.load('results/model_GS_B1_3.npy')
+model_GS_B1_4 = np.load('results/model_GS_B1_4.npy')
+
+transThk = pg.trans.TransLogLU(np.min(thick), np.max(thick))
+transSig = pg.trans.TransLogLU(np.min(conds), np.max(conds))
+lam=0
 
 #%%
 # Optimization Q + IP
 
 # Relative error array
 error = 1e-3 # relative error
-relativeError = np.ones_like(data[0]) * error
-model_est = np.zeros_like(model_GS)
+relativeError = np.ones_like(data_B1_1[0]) * error
+model_est_B1_1 = np.zeros_like(model_GS_B1_1)
 
 # Start inversion
 # Perform inversion for each 1D model per position in stitched section
 for pos in range(npos):
     # Set the initial model from the global search
-    m0 = model_GS[pos]
+    m0 = model_GS_B1_1[pos]
     
     # Initialize the forward modelling class
-    EMf = EMf_3Lay_GSplusOpt_HVP(lambd, height, offsets, freq, filt, m0)
+    EMf = EMf_3Lay_Opt_HVP_1D(lambd, height, offsets, freq, filt, nlay=3)
 
-    # Create inversion
-    invEM = pg.Inversion()
-    invEM.setForwardOperator(EMf)
+    # Define transformation
+    EMf.region(0).setTransModel(transThk)
+    EMf.region(1).setTransModel(transSig)
+    #EMf.transData = transData
     
-    # Setting a lower boundary of conductivities 1 mS/m
-    transModel = pg.trans.TransLogLU(0.001,7) 
-    invEM.modelTrans = transModel
+    # Define inversion framework from pygimli
+    invEM = pg.Inversion()
+    invEM.setForwardOperator(EMf) # set forward operator
 
-    dataE = data[pos].copy()
-    model_est_pos = invEM.run(dataE, relativeError, verbose=False)
-    model_est[pos] = model_est_pos
+    dataE = data_B1_1[pos].copy()
+    model_est_pos = invEM.run(dataE, relativeError, startModel= m0, lam=lam, verbose=True)
+    model_est_B1_1[pos] = model_est_pos
 
-# Save estimated model        
-np.save('results/model_3Lay_GSplusOpt_B1', model_est)
+# Save estimated model    
+np.save('results/model_GSGN_B1_1', model_est_B1_1)
+
+# Relative error array
+error = 1e-3 # relative error
+relativeError = np.ones_like(data_B1_2[0]) * error
+model_est_B1_2 = np.zeros_like(model_GS_B1_2)
+
+# Start inversion
+# Perform inversion for each 1D model per position in stitched section
+for pos in range(npos):
+    # Set the initial model from the global search
+    m0 = model_GS_B1_2[pos]
+    
+    # Initialize the forward modelling class
+    EMf = EMf_3Lay_Opt_HVP_1D(lambd, height, offsets, freq, filt, nlay=3)
+
+    # Define transformation
+    EMf.region(0).setTransModel(transThk)
+    EMf.region(1).setTransModel(transSig)
+    #EMf.transData = transData
+    
+    # Define inversion framework from pygimli
+    invEM = pg.Inversion()
+    invEM.setForwardOperator(EMf) # set forward operator
+
+    dataE = data_B1_2[pos].copy()
+    model_est_pos = invEM.run(dataE, relativeError, startModel= m0, lam=lam, verbose=True)
+    model_est_B1_2[pos] = model_est_pos
+
+# Save estimated model    
+np.save('results/model_GSGN_B1_2', model_est_B1_2)
+
+# Relative error array
+error = 1e-3 # relative error
+relativeError = np.ones_like(data_B1_3[0]) * error
+model_est_B1_3 = np.zeros_like(model_GS_B1_3)
+
+# Start inversion
+# Perform inversion for each 1D model per position in stitched section
+for pos in range(npos):
+    # Set the initial model from the global search
+    m0 = model_GS_B1_3[pos]
+    
+    # Initialize the forward modelling class
+    EMf = EMf_3Lay_Opt_HVP_1D(lambd, height, offsets, freq, filt, nlay=3)
+
+    # Define transformation
+    EMf.region(0).setTransModel(transThk)
+    EMf.region(1).setTransModel(transSig)
+    #EMf.transData = transData
+    
+    # Define inversion framework from pygimli
+    invEM = pg.Inversion()
+    invEM.setForwardOperator(EMf) # set forward operator
+
+    dataE = data_B1_3[pos].copy()
+    model_est_pos = invEM.run(dataE, relativeError, startModel= m0, lam=lam, verbose=True)
+    model_est_B1_3[pos] = model_est_pos
+
+# Save estimated model    
+np.save('results/model_GSGN_B1_3', model_est_B1_3)
+
+# Relative error array
+error = 1e-3 # relative error
+relativeError = np.ones_like(data_B1_4[0]) * error
+model_est_B1_4 = np.zeros_like(model_GS_B1_4)
+
+# Start inversion
+# Perform inversion for each 1D model per position in stitched section
+for pos in range(npos):
+    # Set the initial model from the global search
+    m0 = model_GS_B1_4[pos]
+    
+    # Initialize the forward modelling class
+    EMf = EMf_3Lay_Opt_HVP_1D(lambd, height, offsets, freq, filt, nlay=3)
+
+    # Define transformation
+    EMf.region(0).setTransModel(transThk)
+    EMf.region(1).setTransModel(transSig)
+    #EMf.transData = transData
+    
+    # Define inversion framework from pygimli
+    invEM = pg.Inversion()
+    invEM.setForwardOperator(EMf) # set forward operator
+
+    dataE = data_B1_4[pos].copy()
+    model_est_pos = invEM.run(dataE, relativeError, startModel= m0, lam=lam, verbose=True)
+    model_est_B1_4[pos] = model_est_pos
+
+# Save estimated model    
+np.save('results/model_GSGN_B1_4', model_est_B1_4)

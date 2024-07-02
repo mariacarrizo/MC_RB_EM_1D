@@ -38,9 +38,9 @@ filt = survey['filt']
 m0 = [3, 3, 100/1000, 100/1000, 100/1000]
 lam = 0
 
-transThk = pg.trans.TransLogLU(1,4)
-transSig = pg.trans.TransLogLU(10/1000,2000/1000)
-transData = pg.trans.TransLog()
+transThk = pg.trans.TransLogLU(np.min(thick), np.max(thick))
+transSig = pg.trans.TransLogLU(np.min(conds), np.max(conds))
+#transData = pg.trans.TransLog()
 
 #%%
 # Optimization Q + IP
@@ -52,7 +52,7 @@ EMf = EMf_3Lay_Opt_HVP_1D(lambd, height, offsets, freq, filt, nlay=3)
 # Define transformation
 EMf.region(0).setTransModel(transThk)
 EMf.region(1).setTransModel(transSig)
-EMf.transData = transData
+#EMf.transData = transData
 
 print('Initializing inversion')
 # Define inversion framework from pygimli
@@ -63,16 +63,21 @@ invEM.setForwardOperator(EMf) # set forward operator
 error = 1e-3 # relative error
 relativeError = np.ones_like(data_B1_1[0]) * error
 model_Opt_B1_1 = np.zeros_like(model_B1_1)
+#model_hist = []
 
 # Start inversion
 print('Run inversion')
 # Perform inversion for each 1D model 
 for pos in range(npos):
+    print('pos:', pos)
     dataE = data_B1_1[pos].copy()
     model_Opt_pos = invEM.run(dataE, relativeError, startModel= m0, lam=lam, verbose=True)
+    if pos == 10:
+        model_hist = invEM.modelHistory
     model_Opt_B1_1[pos] = model_Opt_pos
 print('End')
 np.save('results/model_Opt_B1_1', model_Opt_B1_1)
+np.save('results/model_Opt_B1_1_hist', model_hist)
 
 #%%
 # Optimization Q 
@@ -84,7 +89,7 @@ EMf = EMf_3Lay_Opt_HVP_Q_1D(lambd, height, offsets, freq, filt, nlay=3)
 # Define transformation
 EMf.region(0).setTransModel(transThk)
 EMf.region(1).setTransModel(transSig)
-EMf.transData = transData
+#EMf.transData = transData
 
 print('Initializing inversion')
 # Define inversion framework from pygimli
@@ -116,7 +121,7 @@ EMf = EMf_3Lay_Opt_HVP_IP_1D(lambd, height, offsets, freq, filt, nlay=3)
 # Define transformation
 EMf.region(0).setTransModel(transThk)
 EMf.region(1).setTransModel(transSig)
-EMf.transData = transData
+#EMf.transData = transData
 
 print('Initializing inversion')
 # Define inversion framework from pygimli
@@ -148,7 +153,7 @@ EMf = EMf_3Lay_Opt_HVP_1D(lambd, height, offsets, freq, filt, nlay=3)
 # Define transformation
 EMf.region(0).setTransModel(transThk)
 EMf.region(1).setTransModel(transSig)
-EMf.transData = transData
+#EMf.transData = transData
 
 print('Initializing inversion')
 # Define inversion framework from pygimli
@@ -159,16 +164,21 @@ invEM.setForwardOperator(EMf) # set forward operator
 error = 1e-3 # relative error
 relativeError = np.ones_like(data_B1_2[0]) * error
 model_Opt_B1_2 = np.zeros_like(model_B1_2)
+#model_hist = []
 
 # Start inversion
 print('Run inversion')
 # Perform inversion for each 1D model 
 for pos in range(npos):
+    print('pos:', pos)
     dataE = data_B1_2[pos].copy()
     model_Opt_pos = invEM.run(dataE, relativeError, startModel= m0, lam=lam, verbose=True)
     model_Opt_B1_2[pos] = model_Opt_pos
+    if pos == 10:
+        model_hist = invEM.modelHistory
 print('End')
 np.save('results/model_Opt_B1_2', model_Opt_B1_2)
+np.save('results/model_Opt_B1_2_hist', model_hist)
 
 #%%
 # Optimization Q 
@@ -180,7 +190,7 @@ EMf = EMf_3Lay_Opt_HVP_Q_1D(lambd, height, offsets, freq, filt, nlay=3)
 # Define transformation
 EMf.region(0).setTransModel(transThk)
 EMf.region(1).setTransModel(transSig)
-EMf.transData = transData
+#EMf.transData = transData
 
 print('Initializing inversion')
 # Define inversion framework from pygimli
@@ -212,7 +222,7 @@ EMf = EMf_3Lay_Opt_HVP_IP_1D(lambd, height, offsets, freq, filt, nlay=3)
 # Define transformation
 EMf.region(0).setTransModel(transThk)
 EMf.region(1).setTransModel(transSig)
-EMf.transData = transData
+#EMf.transData = transData
 
 print('Initializing inversion')
 # Define inversion framework from pygimli
@@ -237,6 +247,8 @@ np.save('results/model_Opt_IP_B1_2', model_Opt_B1_2)
 #%%
 # Optimization Q + IP
 
+m0 = [3, 3, 200/1000, 200/1000, 200/1000]
+
 print('Estimating model B1-3 using Q+IP')
 # Initialize the forward modelling class 
 EMf = EMf_3Lay_Opt_HVP_1D(lambd, height, offsets, freq, filt, nlay=3)
@@ -244,7 +256,7 @@ EMf = EMf_3Lay_Opt_HVP_1D(lambd, height, offsets, freq, filt, nlay=3)
 # Define transformation
 EMf.region(0).setTransModel(transThk)
 EMf.region(1).setTransModel(transSig)
-EMf.transData = transData
+#EMf.transData = transData
 
 print('Initializing inversion')
 # Define inversion framework from pygimli
@@ -255,16 +267,21 @@ invEM.setForwardOperator(EMf) # set forward operator
 error = 1e-3 # relative error
 relativeError = np.ones_like(data_B1_3[0]) * error
 model_Opt_B1_3 = np.zeros_like(model_B1_3)
+#model_hist = []
 
 # Start inversion
 print('Run inversion')
 # Perform inversion for each 1D model 
 for pos in range(npos):
+    print('pos:', pos)
     dataE = data_B1_3[pos].copy()
     model_Opt_pos = invEM.run(dataE, relativeError, startModel= m0, lam=lam, verbose=True)
     model_Opt_B1_3[pos] = model_Opt_pos
+    if pos == 10:
+        model_hist = invEM.modelHistory
 print('End')
 np.save('results/model_Opt_B1_3', model_Opt_B1_3)
+np.save('results/model_Opt_B1_3_hist', model_hist)
 
 #%%
 # Optimization Q 
@@ -276,7 +293,7 @@ EMf = EMf_3Lay_Opt_HVP_Q_1D(lambd, height, offsets, freq, filt, nlay=3)
 # Define transformation
 EMf.region(0).setTransModel(transThk)
 EMf.region(1).setTransModel(transSig)
-EMf.transData = transData
+#EMf.transData = transData
 
 print('Initializing inversion')
 # Define inversion framework from pygimli
@@ -308,7 +325,7 @@ EMf = EMf_3Lay_Opt_HVP_IP_1D(lambd, height, offsets, freq, filt, nlay=3)
 # Define transformation
 EMf.region(0).setTransModel(transThk)
 EMf.region(1).setTransModel(transSig)
-EMf.transData = transData
+#EMf.transData = transData
 
 print('Initializing inversion')
 # Define inversion framework from pygimli
@@ -332,6 +349,7 @@ np.save('results/model_Opt_IP_B1_3', model_Opt_B1_3)
 
 #%%
 # Optimization Q + IP
+m0 = [3, 3, 400/1000, 400/1000, 400/1000]
 
 print('Estimating model B1-4 using Q+IP')
 # Initialize the forward modelling class 
@@ -340,7 +358,7 @@ EMf = EMf_3Lay_Opt_HVP_1D(lambd, height, offsets, freq, filt, nlay=3)
 # Define transformation
 EMf.region(0).setTransModel(transThk)
 EMf.region(1).setTransModel(transSig)
-EMf.transData = transData
+#EMf.transData = transData
 
 print('Initializing inversion')
 # Define inversion framework from pygimli
@@ -351,16 +369,21 @@ invEM.setForwardOperator(EMf) # set forward operator
 error = 1e-3 # relative error
 relativeError = np.ones_like(data_B1_4[0]) * error
 model_Opt_B1_4 = np.zeros_like(model_B1_4)
+#model_hist = []
 
 # Start inversion
 print('Run inversion')
 # Perform inversion for each 1D model 
 for pos in range(npos):
+    print('pos:', pos)
     dataE = data_B1_4[pos].copy()
     model_Opt_pos = invEM.run(dataE, relativeError, startModel= m0, lam=lam, verbose=True)
     model_Opt_B1_4[pos] = model_Opt_pos
+    if pos == 10:
+        model_hist = invEM.modelHistory
 print('End')
 np.save('results/model_Opt_B1_4', model_Opt_B1_4)
+np.save('results/model_Opt_B1_4_hist', model_hist)
 
 #%%
 # Optimization Q 
@@ -372,7 +395,7 @@ EMf = EMf_3Lay_Opt_HVP_Q_1D(lambd, height, offsets, freq, filt, nlay=3)
 # Define transformation
 EMf.region(0).setTransModel(transThk)
 EMf.region(1).setTransModel(transSig)
-EMf.transData = transData
+#EMf.transData = transData
 
 print('Initializing inversion')
 # Define inversion framework from pygimli
@@ -404,7 +427,7 @@ EMf = EMf_3Lay_Opt_HVP_IP_1D(lambd, height, offsets, freq, filt, nlay=3)
 # Define transformation
 EMf.region(0).setTransModel(transThk)
 EMf.region(1).setTransModel(transSig)
-EMf.transData = transData
+#EMf.transData = transData
 
 print('Initializing inversion')
 # Define inversion framework from pygimli

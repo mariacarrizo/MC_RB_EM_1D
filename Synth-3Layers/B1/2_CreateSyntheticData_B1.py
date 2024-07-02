@@ -37,7 +37,7 @@ x = np.linspace(0, 20, npos)[:,None]
 
 #  Thicknesses in m
 thk1 = np.ones_like(x)*3
-thk2 = np.ones_like(x) + x/10
+thk2 = np.ones_like(x) + x/10 +.6
 
 model_B1_1 = np.hstack((thk1, thk2, sigmas_B1_1))
 model_B1_2 = np.hstack((thk1, thk2, sigmas_B1_2))
