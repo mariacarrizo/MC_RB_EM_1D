@@ -11,7 +11,7 @@ from EM1D import EMf_3Lay_Opt_HVP_1D, EMf_3Lay_Opt_HVP_Q_1D, EMf_3Lay_Opt_HVP_IP
 
 # Import the conductivities and thicknesses used to create the LU table
 conds = np.load('../data/conds.npy')
-thick = np.load('../data/thicks.npy')
+thicks = np.load('../data/thicks.npy')
 
 # Import true models and data 
 model_B2_1 = np.load('models/model_synth_B2_1.npy')
@@ -35,7 +35,7 @@ freq = survey['freq']
 lambd = survey['lambd']
 filt = survey['filt']
 
-m0 = [3, 3, 500/1000, 500/1000, 500/1000]
+m0 = [3, 3, 100/1000, 100/1000, 100/1000]
 lam = 0
 
 #%%
@@ -45,8 +45,8 @@ print('Estimating model B2-1 using Q+IP')
 # Initialize the forward modelling class 
 EMf = EMf_3Lay_Opt_HVP_1D(lambd, height, offsets, freq, filt, nlay=3)
 
-transThk = pg.trans.TransLogLU(0.1,7)
-transSig = pg.trans.TransLogLU(10/1000,2000/1000)
+transThk = pg.trans.TransLogLU(np.min(thicks),np.max(thicks))
+transSig = pg.trans.TransLogLU(np.min(conds),np.max(conds))
 
 # Define transformation
 EMf.region(0).setTransModel(transThk)
@@ -244,7 +244,7 @@ np.save('results/model_Opt_IP_B2_2', model_Opt_B2_2)
 
 #%%
 # Optimization Q + IP
-
+m0 = [3, 3, 200/1000, 200/1000, 200/1000]
 print('Estimating model B2-3 using Q+IP')
 # Initialize the forward modelling class 
 EMf = EMf_3Lay_Opt_HVP_1D(lambd, height, offsets, freq, filt, nlay=3)
@@ -346,7 +346,7 @@ np.save('results/model_Opt_IP_B2_3', model_Opt_B2_3)
 
 #%%
 # Optimization Q + IP
-
+m0 = [3, 3, 400/1000, 400/1000, 400/1000]
 print('Estimating model B2-4 using Q+IP')
 # Initialize the forward modelling class 
 EMf = EMf_3Lay_Opt_HVP_1D(lambd, height, offsets, freq, filt, nlay=3)
