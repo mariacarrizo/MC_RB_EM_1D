@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """ 
-Script Name: 9_Simulate_noise_A1.py
+Script Name: 8_Simulate_noise_A1.py
 Description: Script to Simulate data from estimated models with noise included
 Author: @mariacarrizo
 Email: m.e.carrizomascarell@tudelft.nl
