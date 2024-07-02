@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """ 
 Script Name: 6_GaussNewton_Noise_A1.py
 Description: Script to test Gauss-Newton inversion in A1 cases with noisy data 
@@ -5,7 +7,6 @@ Author: @mariacarrizo
 Email: mecarrizomasca@tudelft.nl
 Date created: 18/12/2023
 """
-# Testing optimization case A.1 with noisy data 
 
 # import libraries
 import pygimli as pg

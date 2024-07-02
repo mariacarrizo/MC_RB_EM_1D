@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """ 
 Script Name: 2_CreateSyntheticData_A1.py
 Description: Script to create synthetic models in A1 cases
