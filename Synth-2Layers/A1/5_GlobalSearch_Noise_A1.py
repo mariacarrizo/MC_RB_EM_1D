@@ -1,8 +1,10 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """ 
 Script Name: 5_GlobalSearch_Noise_A1.py
 Description: Script to test global search in A1 cases with noisy data 
 Author: @mariacarrizo
-Email: mecarrizomasca@tudelft.nl
+Email: m.e.carrizomascarell@tudelft.nl
 Date created: 18/12/2023
 """
 

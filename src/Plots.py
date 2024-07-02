@@ -4,7 +4,7 @@
 Script Name: Plots.py
 Description: Script with model and data visualization functions 
 Author: @mariacarrizo
-Email: mecarrizomasca@tudelft.nl
+Email: m.e.carrizomascarell@tudelft.nl
 Date created: 18/12/2023
 """
 

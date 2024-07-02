@@ -4,7 +4,7 @@
 Script Name: 9_Simulate_noise_A1.py
 Description: Script to Simulate data from estimated models with noise included
 Author: @mariacarrizo
-Email: mecarrizomasca@tudelft.nl
+Email: m.e.carrizomascarell@tudelft.nl
 Date created: 19/12/2023
 """
 

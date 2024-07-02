@@ -4,7 +4,7 @@
 Script Name: 8_Simulate_A1.py
 Description: Script to Simulate data from estimated models
 Author: @mariacarrizo
-Email: mecarrizomasca@tudelft.nl
+Email: m.e.carrizomascarell@tudelft.nl
 Date created: 19/12/2023
 """
 

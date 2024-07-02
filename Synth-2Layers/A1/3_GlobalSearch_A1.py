@@ -1,8 +1,10 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """ 
 Script Name: 3_GlobalSearch_A1.py
 Description: Script to perform global search inversion for A1 cases
 Author: @mariacarrizo
-Email: mecarrizomasca@tudelft.nl
+Email: m.e.carrizomascarell@tudelft.nl
 Date created: 17/12/2023
 """
 
