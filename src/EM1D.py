@@ -4,7 +4,7 @@
 Script Name: EM1D.py
 Description: This script contains the Forward Functions and Inversion classes
 Author: Maria Carrizo
-Email: mecarrizomasca@tudelft.nl
+Email: m.e.carrizomascarell@tudelft.nl
 Date created: 15/12/2023
 """
 
@@ -14,6 +14,14 @@ import pygimli as pg
 from itertools import product
 
 #%%
+
+def nrmse(obs, pred):
+    """ Normalized rmse 
+    obs : observed
+    pred : predicted
+    """
+    return root_mean_squared_error(obs, pred)/np.abs(np.max(obs)-np.min(obs))
+
 # Functions to calculate mutual impedance ratios
 
 def Z_H(s, R_0, lambd, a, filt):
