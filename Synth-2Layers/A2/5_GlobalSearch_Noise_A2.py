@@ -1,4 +1,12 @@
-# Testing global search case A.1 with noisy data 
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+""" 
+Script Name: 5_GlobalSearch_Noise_A2.py
+Description: Script to test global search in A2 cases with noisy data 
+Author: @mariacarrizo
+Email: m.e.carrizomascarell@tudelft.nl
+Date created: 18/12/2023
+"""
 
 # Import libraries
 import numpy as np
@@ -12,6 +20,7 @@ from EM1D import GlobalSearch_2Lay
 LUT = np.load('../data/LUTable_2Lay.npy')
 conds = np.load('../data/conds.npy')
 thicks =  np.load('../data/thicks.npy')
+nsl = len(conds) # sampling number in lookup table
 
 # Load true model and data
 data_A2_1 = np.load('data/data_synth_2Lay_A2_1.npy')
@@ -26,7 +35,6 @@ model_A2_4 = np.load('models/model_synth_2Lay_A2_4.npy')
 
 # number of 1D models
 npos = len(data_A2_1)
-nsl = len(conds)
 
 # Creating model and data arrays
 data_noise_2_A2_1 = data_A2_1.copy()

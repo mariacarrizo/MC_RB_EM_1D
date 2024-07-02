@@ -1,12 +1,14 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 """ 
+Script Name: 3_GlobalSearch_A2.py
+Description: Script to perform global search inversion for A2 cases
 Author: @mariacarrizo
-Date created: 15/12/2024
-
-Script to perform global search inversion for case A.1
+Email: m.e.carrizomascarell@tudelft.nl
+Date created: 17/12/2023
 """
 
 # Import libraries
-
 import numpy as np
 import time
 import sys
@@ -19,6 +21,7 @@ from EM1D import GlobalSearch_2Lay
 LUT = np.load('../data/LUTable_2Lay.npy')
 conds = np.load('../data/conds.npy')
 thicks =  np.load('../data/thicks.npy')
+nsl = len(conds) # sampling number
 
 # Load true data and true model
 data_A2_1 = np.load('data/data_synth_2Lay_A2_1.npy')
@@ -33,10 +36,10 @@ model_A2_4 = np.load('models/model_synth_2Lay_A2_4.npy')
 
 # number of 1D models
 npos = len(data_A2_1)
-nsl = len(conds)
 
+# Empty arrays for estimated models
 # Estimate with both Quadrature and In Phase
-model_GS_A2_1 = np.zeros_like(model_A2_1) # Empty array for estimated model
+model_GS_A2_1 = np.zeros_like(model_A2_1) 
 model_GS_A2_2 = np.zeros_like(model_A2_2)
 model_GS_A2_3 = np.zeros_like(model_A2_3)
 model_GS_A2_4 = np.zeros_like(model_A2_4)
@@ -138,17 +141,17 @@ endtime = time.time() - starttime
 print('Global search IP execution for ', npos, ' positions: ', f"{endtime:.3}", ' seconds')
 
 # Save estimated models
-np.save('results/model_2Lay_A2_1', model_GS_A2_1)
-np.save('results/model_2Lay_A2_2', model_GS_A2_2)
-np.save('results/model_2Lay_A2_3', model_GS_A2_3)
-np.save('results/model_2Lay_A2_4', model_GS_A2_4)
+np.save('results/model_GS_A2_1', model_GS_A2_1)
+np.save('results/model_GS_A2_2', model_GS_A2_2)
+np.save('results/model_GS_A2_3', model_GS_A2_3)
+np.save('results/model_GS_A2_4', model_GS_A2_4)
 
-np.save('results/model_2Lay_Q_A2_1', model_GS_Q_A2_1)
-np.save('results/model_2Lay_Q_A2_2', model_GS_Q_A2_2)
-np.save('results/model_2Lay_Q_A2_3', model_GS_Q_A2_3)
-np.save('results/model_2Lay_Q_A2_4', model_GS_Q_A2_4)
+np.save('results/model_GS_Q_A2_1', model_GS_Q_A2_1)
+np.save('results/model_GS_Q_A2_2', model_GS_Q_A2_2)
+np.save('results/model_GS_Q_A2_3', model_GS_Q_A2_3)
+np.save('results/model_GS_Q_A2_4', model_GS_Q_A2_4)
 
-np.save('results/model_2Lay_IP_A2_1', model_GS_IP_A2_1)
-np.save('results/model_2Lay_IP_A2_2', model_GS_IP_A2_2)
-np.save('results/model_2Lay_IP_A2_3', model_GS_IP_A2_3)
-np.save('results/model_2Lay_IP_A2_4', model_GS_IP_A2_4)
+np.save('results/model_GS_IP_A2_1', model_GS_IP_A2_1)
+np.save('results/model_GS_IP_A2_2', model_GS_IP_A2_2)
+np.save('results/model_GS_IP_A2_3', model_GS_IP_A2_3)
+np.save('results/model_GS_IP_A2_4', model_GS_IP_A2_4)
