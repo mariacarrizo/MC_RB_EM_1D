@@ -168,7 +168,8 @@ Synth-3Layers/data/LUTable_3Lay.npy
 #Synth-2Layers/A2/data/*.npy
 #Synth-2Layers/A2/results/*.npy
 #Synth-3Layers/B1/data/*.npy
-#Synth-3Layers/B1/results/*.npy
+Synth-3Layers/B1/results/err*.npy
+Synth-3Layers/B1/results/models_err*.npy
 #Synth-3Layers/B2/data/*.npy
 #Synth-3Layers/B2/results/*.npy
 Field_Case/data/*.npy
