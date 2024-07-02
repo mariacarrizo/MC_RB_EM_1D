@@ -1,4 +1,4 @@
-# GSplusOpt
+# MC_RB_EM_1D
 
 This repo contains the implementation of the algorithms shown in: [Combining global search inversion and optimization to estimate 1D electrical conductivity using frequency domain electromagnetic induction measurements].
 
