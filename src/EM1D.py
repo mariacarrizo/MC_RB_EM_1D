@@ -1258,3 +1258,75 @@ def SolSpa_2Lay_sigma2(lambd, height, offsets, freq, filt, model_true, data_true
     models_err = np.array(models_err)
 
     return err, models_err
+
+def SolSpa_2Lay_sigma1_Q(lambd, height, offsets, freq, filt, model_true, data_true, pos, thicks, conds, max_nrmse=0.4):
+    """ Function to evaluate the solution space in a 2-Layered model
+    for a fixed value of sigma_1, using only Q data
+    
+    model_true : true model
+    data_true : true data
+    pos : position of the 1D model to evaluate
+    thicks : thicknesses sampled in the solution space
+    conds : conductivities sampled in the solution space 
+    max_nrmse : a maximum value of the nrmse to evaluate in the solution space
+    
+    returns error values and models sampled in the solution space
+    """
+    
+    err = [] # to store error values
+    models_err = [] # to store the models of the solution space
+    
+    # evaluate solution space
+    for h1 in thicks:
+        for sigma2 in conds:
+            sigma1 = model_true[pos,1]
+            mod = [h1, sigma1, sigma2]
+            dat = EMf_2Lay_HVP_Q(lambd, sigma1, sigma2, h1, height, offsets, freq, filt)
+            n = nrmse(data_true[pos,:9], dat)
+            
+            # if the error is below max_err, append
+            if n < max_nrmse:
+                err.append(n)    
+                models_err.append(mod)
+
+    # convert into numpy arrays
+    err = np.array(err)
+    models_err = np.array(models_err)
+
+    return err, models_err
+
+def SolSpa_2Lay_sigma2_Q(lambd, height, offsets, freq, filt, model_true, data_true, pos, thicks, conds, max_nrmse=0.4):
+    """ Function to evaluate the solution space in a 2-Layered model
+    for a fixed value of sigma_2 using only Q data
+    
+    model_true : true model
+    data_true : true data
+    pos : position of the 1D model to evaluate
+    thicks : thicknesses sampled in the solution space
+    conds : conductivities sampled in the solution space 
+    max_nrmse : a maximum value of the nrmse to evaluate in the solution space
+    
+    returns error values and models sampled in the solution space
+    """
+        
+    err = [] # to store error values
+    models_err = [] # to store the models of the solution space
+    
+    # evaluate solution space
+    for h1 in thicks:
+        for sigma1 in conds:
+            sigma2 = model_true[pos,2]
+            mod = [h1, sigma1, sigma2]
+            dat = EMf_2Lay_HVP_Q(lambd, sigma1, sigma2, h1, height, offsets, freq, filt)
+            n = nrmse(data_true[pos,:9], dat) # calculate normalized rmse for the sampled model
+            
+            # if the error is below max_err, append
+            if n < max_nrmse:
+                err.append(n)    
+                models_err.append(mod)
+
+    # convert into numpy arrays
+    err = np.array(err)
+    models_err = np.array(models_err)
+
+    return err, models_err
