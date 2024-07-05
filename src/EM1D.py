@@ -1136,10 +1136,14 @@ def Q_from_Sigma(sigma, s, freq=9000, mu_0=mu_0):
     return Q
 
 # Global search noise analysis
-def NoiseAnalysis_GS_2Lay(data_true, noise=0.1, test_it=100):
+def NoiseAnalysis_GS_2Lay(LUT, conds, thicks, nsl, data_true, noise=0.1, test_it=100):
     """ 
     Function to estimate a model using global search for a percentage of noise
     in a number of random instances
+    LUT : Lookup table
+    conds : conductivities sampled in the lookup table
+    thicks : thicknesses sampled in the lookup table
+    nsl : sampling number of the lookup table
     data_true : true data
     noise : noise percentage
     tes_it : number of instances
@@ -1152,7 +1156,7 @@ def NoiseAnalysis_GS_2Lay(data_true, noise=0.1, test_it=100):
     return models_GS 
 
 # Gauss-Newton noise analysis
-def NoiseAnalysis_GN_2Lay(data_true, noise=0.1, test_it=100):
+def NoiseAnalysis_GN_2Lay(lambd, height, offsets, freq, filt, model_ini, data_true, noise=0.1, test_it=100):
     """ 
     Function to estimate a model using Gauss-Newton for a percentage of noise
     in a number of random instances
@@ -1171,7 +1175,7 @@ def NoiseAnalysis_GN_2Lay(data_true, noise=0.1, test_it=100):
     
     for i in range(test_it):
         # Define forward modelling class
-        EMf = EMf_2Lay_Opt_HVP_1D(lambd, height, offsets, freq, filt, nlay=2)
+        EMf = EMf_2Lay_GN_HVP_1D(lambd, height, offsets, freq, filt, nlay=2)
 
         # Define transformation
         EMf.region(0).setTransModel(transThk)
@@ -1184,3 +1188,73 @@ def NoiseAnalysis_GN_2Lay(data_true, noise=0.1, test_it=100):
         data_noise = data_true* (1 +np.random.normal(size=len(data_true))*noise)
         models_GN.append(invEM.run(data_noise, relativeError, startModel= m0, lam=lam, verbose=False))
     return models_GN
+
+def SolSpa_2Lay_sigma1(lambd, height, offsets, freq, filt, model_true, data_true, pos, thicks, conds, max_nrmse=0.4):
+    """ Function to evaluate the solution space in a 2-Layered model
+    for a fixed value of sigma_1
+    model_true : true model
+    data_true : true data
+    pos : position of the 1D model to evaluate
+    thicks : thicknesses sampled in the solution space
+    conds : conductivities sampled in the solution space 
+    max_nrmse : a maximum value of the nrmse to evaluate in the solution space
+    
+    returns error values and models sampled in the solution space
+    """
+    
+    err = [] # to store error values
+    models_err = [] # to store the models of the solution space
+    
+    # evaluate solution space
+    for h1 in thicks:
+        for sigma2 in conds:
+            sigma1 = model_true[pos,1]
+            mod = [h1, sigma1, sigma2]
+            dat = EMf_2Lay_HVP(lambd, sigma1, sigma2, h1, height, offsets, freq, filt)
+            n = nrmse(data_true[pos], dat) # calculate normalized rmse for the sampled model
+            
+            # if the error is below max_err, append
+            if n < max_nrmse:
+                err.append(n)    
+                models_err.append(mod)
+
+    # convert into numpy arrays
+    err = np.array(err)
+    models_err = np.array(models_err)
+
+    return err, models_err
+
+def SolSpa_2Lay_sigma2(lambd, height, offsets, freq, filt, model_true, data_true, pos, thicks, conds, max_nrmse=0.4):
+    """ Function to evaluate the solution space in a 2-Layered model
+    for a fixed value of sigma_2
+    model_true : true model
+    data_true : true data
+    pos : position of the 1D model to evaluate
+    thicks : thicknesses sampled in the solution space
+    conds : conductivities sampled in the solution space 
+    max_nrmse : a maximum value of the nrmse to evaluate in the solution space
+    
+    returns error values and models sampled in the solution space
+    """
+        
+    err = [] # to store error values
+    models_err = [] # to store the models of the solution space
+    
+    # evaluate solution space
+    for h1 in thicks:
+        for sigma1 in conds:
+            sigma2 = model_true[pos,2]
+            mod = [h1, sigma1, sigma2]
+            dat = EMf_2Lay_HVP(lambd, sigma1, sigma2, h1, height, offsets, freq, filt)
+            n = nrmse(data_true[pos], dat) # calculate normalized rmse for the sampled model
+            
+            # if the error is below max_err, append
+            if n < max_nrmse:
+                err.append(n)    
+                models_err.append(mod)
+
+    # convert into numpy arrays
+    err = np.array(err)
+    models_err = np.array(models_err)
+
+    return err, models_err
