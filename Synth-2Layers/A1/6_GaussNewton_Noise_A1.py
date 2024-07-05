@@ -15,7 +15,7 @@ import sys
 sys.path.insert(1, '../../src')
 
 # Import forward modelling class for 2-layered models
-from EM1D import EMf_2Lay_Opt_HVP_1D
+from EM1D import EMf_2Lay_GN_HVP_1D
 
 # Load survey parameters
 survey = np.load('../data/survey_2Lay.npy', allow_pickle=True).item()
@@ -63,12 +63,12 @@ transThk = pg.trans.TransLogLU(0.1,7)
 transSig = pg.trans.TransLogLU(10/1000,2000/1000)
 
 #%%
-# Optimization for data [Q + IP] noise 2.5 %
+# Gauss-Newton for data [Q + IP] noise 2.5 %
 
 ## Case A1-1
 print('Estimating model n2 A1-1')
 # Initialize the forward modelling class 
-EMf = EMf_2Lay_Opt_HVP_1D(lambd, height, offsets, freq, filt, nlay=2)
+EMf = EMf_2Lay_GN_HVP_1D(lambd, height, offsets, freq, filt, nlay=2)
 
 # Define transformation
 EMf.region(0).setTransModel(transThk)
@@ -97,7 +97,7 @@ print('End')
 ## Case A1-2
 print('Estimating model n2 A1-2')
 # Initialize the forward modelling class 
-EMf = EMf_2Lay_Opt_HVP_1D(lambd, height, offsets, freq, filt, nlay=2)
+EMf = EMf_2Lay_GN_HVP_1D(lambd, height, offsets, freq, filt, nlay=2)
 
 # Define transformation
 EMf.region(0).setTransModel(transThk)
@@ -126,7 +126,7 @@ print('End')
 ## Case A1-3
 print('Estimating model n2 A1-3')
 # Initialize the forward modelling class 
-EMf = EMf_2Lay_Opt_HVP_1D(lambd, height, offsets, freq, filt, nlay=2)
+EMf = EMf_2Lay_GN_HVP_1D(lambd, height, offsets, freq, filt, nlay=2)
 
 # Define transformation
 EMf.region(0).setTransModel(transThk)
@@ -155,7 +155,7 @@ print('End')
 ## Case A1-4
 print('Estimating model n2 A1-4')
 # Initialize the forward modelling class 
-EMf = EMf_2Lay_Opt_HVP_1D(lambd, height, offsets, freq, filt, nlay=2)
+EMf = EMf_2Lay_GN_HVP_1D(lambd, height, offsets, freq, filt, nlay=2)
 
 # Define transformation
 EMf.region(0).setTransModel(transThk)
@@ -181,12 +181,12 @@ for pos in range(npos):
     model_GN_n2_A1_4[pos] = model_GN_pos
 print('End')
 
-## Optimization for data [Q + IP] noise 5 %
+## Gauss-Newton for data [Q + IP] noise 5 %
 
 ## Case A1-1
 print('Estimating model n5 A1-1')
 # Initialize the forward modelling class 
-EMf = EMf_2Lay_Opt_HVP_1D(lambd, height, offsets, freq, filt, nlay=2)
+EMf = EMf_2Lay_GN_HVP_1D(lambd, height, offsets, freq, filt, nlay=2)
 
 # Define transformation
 EMf.region(0).setTransModel(transThk)
@@ -215,7 +215,7 @@ print('End')
 ## Case A1-2
 print('Estimating model n5 A1-2')
 # Initialize the forward modelling class 
-EMf = EMf_2Lay_Opt_HVP_1D(lambd, height, offsets, freq, filt, nlay=2)
+EMf = EMf_2Lay_GN_HVP_1D(lambd, height, offsets, freq, filt, nlay=2)
 
 # Define transformation
 EMf.region(0).setTransModel(transThk)
@@ -244,7 +244,7 @@ print('End')
 ## Case A1-3
 print('Estimating model n5 A1-3')
 # Initialize the forward modelling class 
-EMf = EMf_2Lay_Opt_HVP_1D(lambd, height, offsets, freq, filt, nlay=2)
+EMf = EMf_2Lay_GN_HVP_1D(lambd, height, offsets, freq, filt, nlay=2)
 
 # Define transformation
 EMf.region(0).setTransModel(transThk)
@@ -273,7 +273,7 @@ print('End')
 ## Case A1-4
 print('Estimating model n5 A1-4')
 # Initialize the forward modelling class 
-EMf = EMf_2Lay_Opt_HVP_1D(lambd, height, offsets, freq, filt, nlay=2)
+EMf = EMf_2Lay_GN_HVP_1D(lambd, height, offsets, freq, filt, nlay=2)
 
 # Define transformation
 EMf.region(0).setTransModel(transThk)
@@ -299,12 +299,12 @@ for pos in range(npos):
     model_GN_n5_A1_4[pos] = model_GN_pos
 print('End')
 
-## Optimization for data [Q + IP] noise 10 %
+## Gauss-Newton for data [Q + IP] noise 10 %
 
 ## Case A1-1
 print('Estimating model n10 A1-1')
 # Initialize the forward modelling class 
-EMf = EMf_2Lay_Opt_HVP_1D(lambd, height, offsets, freq, filt, nlay=2)
+EMf = EMf_2Lay_GN_HVP_1D(lambd, height, offsets, freq, filt, nlay=2)
 
 # Define transformation
 EMf.region(0).setTransModel(transThk)
@@ -333,7 +333,7 @@ print('End')
 ## Case A1-2
 print('Estimating model n10 A1-2')
 # Initialize the forward modelling class 
-EMf = EMf_2Lay_Opt_HVP_1D(lambd, height, offsets, freq, filt, nlay=2)
+EMf = EMf_2Lay_GN_HVP_1D(lambd, height, offsets, freq, filt, nlay=2)
 
 # Define transformation
 EMf.region(0).setTransModel(transThk)
@@ -362,7 +362,7 @@ print('End')
 ## Case A1-3
 print('Estimating model n10 A1-3')
 # Initialize the forward modelling class 
-EMf = EMf_2Lay_Opt_HVP_1D(lambd, height, offsets, freq, filt, nlay=2)
+EMf = EMf_2Lay_GN_HVP_1D(lambd, height, offsets, freq, filt, nlay=2)
 
 # Define transformation
 EMf.region(0).setTransModel(transThk)
@@ -391,7 +391,7 @@ print('End')
 ## Case A1-4
 print('Estimating model n10 A1-4')
 # Initialize the forward modelling class 
-EMf = EMf_2Lay_Opt_HVP_1D(lambd, height, offsets, freq, filt, nlay=2)
+EMf = EMf_2Lay_GN_HVP_1D(lambd, height, offsets, freq, filt, nlay=2)
 
 # Define transformation
 EMf.region(0).setTransModel(transThk)
