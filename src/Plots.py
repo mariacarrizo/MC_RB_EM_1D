@@ -15,6 +15,7 @@ from matplotlib.collections import PatchCollection
 from matplotlib.colors import LogNorm
 from sklearn.metrics import root_mean_squared_error
 from matplotlib import colors
+import matplotlib.tri as tri
 
 import pygimli as pg
 from pygimli.utils import rndig
@@ -267,8 +268,8 @@ def Plot_Noise_Analysis(models_noise, model_true, model_est, dmax=-8, ax=None, x
     Plot1DModel(sigma_est, depth_est, model_name='Est', ax=ax, model_style='r', ylab=ylab, xlab=xlab)
     
 # Function to plot Solution space for a fixed sigma1
-def Plot_SolSpa_sigma1(ax1, ax2, model, model_GS, model_GN, model_ini, model_hist,
-                       err, models_err, xmin=100, xmax=2000, ymin=0, ymax=7, case='', title='Solution Space', 
+def Plot_SolSpa_sigma1(fig, ax1, ax2, model, model_GS, model_GN, model_ini, model_hist,
+                       err, models_err, pos, xmin=100, xmax=2000, ymin=0, ymax=7, case='', title='Solution Space', 
                        depthmax=-8, colorbar=True):
     """
     Plotting function of the solution space for a fixed sigma1
@@ -303,7 +304,7 @@ def Plot_SolSpa_sigma1(ax1, ax2, model, model_GS, model_GN, model_ini, model_his
     # Plot 1D models
     ax1.step(sigma_true, depth_true, 'k', label = 'True', linewidth=4)
     ax1.step(sigma_GS, depth_GS, 'r', label='GS')
-    ax1.step(sigma_Opt, depth_Opt, 'c', label='GI')
+    ax1.step(sigma_GN, depth_GN, 'c', label='GI')
     ax1.step(sigma_ini, depth_ini, 'g', label='Initial')
     ax1.set_xlim([10,2000])
     ax1.set_ylabel('Depth [m]', fontsize=8)
@@ -337,7 +338,7 @@ def Plot_SolSpa_sigma1(ax1, ax2, model, model_GS, model_GN, model_ini, model_his
     ax2.set(xlim=(xmin, xmax), ylim=(ymin, ymax))
     ax2.scatter(model[2]*1000, model[0], marker='o', c='w', label='True model', s=100)
     ax2.scatter(model_GS[2]*1000, model_GS[0], marker ='x', c='r', label='GS', s=100)
-    ax2.scatter(model_Opt[2]*1000, model_Opt[0], marker ='.', c='y', label='GN', s=100)
+    ax2.scatter(model_GN[2]*1000, model_GN[0], marker ='.', c='y', label='GN', s=100)
     ax2.scatter(model_ini[2]*1000, model_ini[0], marker ='.', c='k', label='Initial', s=100)
     # Plot update path
     for i in range(len(model_hist)+1):
@@ -348,7 +349,7 @@ def Plot_SolSpa_sigma1(ax1, ax2, model, model_GS, model_GN, model_ini, model_his
     ax2.set_ylabel('$h_1$ [m]', fontsize=8)
     ax2.legend(fontsize=7)
     ax2.tick_params(axis='both',labelsize=9)
-    ax2.set_title(method, fontsize=8)
+    #ax2.set_title(method, fontsize=8)
     ax2.set_xscale('log')
     
     if colorbar==True:
@@ -357,8 +358,8 @@ def Plot_SolSpa_sigma1(ax1, ax2, model, model_GS, model_GN, model_ini, model_his
         clb.ax.tick_params(labelsize=9)
     
 # Function to plot Solution space for a fixed sigma2
-def Plot_SolSpa_sigma2(ax1, ax2, model, model_GS, model_GN, model_ini, model_hist,
-                       err, models_err, xmin=10, xmax=600, ymin=0, ymax=7, case='', title='Solution Space', 
+def Plot_SolSpa_sigma2(fig, ax1, ax2, model, model_GS, model_GN, model_ini, model_hist,
+                       err, models_err, pos, xmin=10, xmax=600, ymin=0, ymax=7, case='', title='Solution Space', 
                        depthmax=-8, colorbar=True):
     """
     Plotting function of the solution space for a fixed sigma2
@@ -393,7 +394,7 @@ def Plot_SolSpa_sigma2(ax1, ax2, model, model_GS, model_GN, model_ini, model_his
     # Plot 1D models
     ax1.step(sigma_true, depth_true, 'k', label = 'True', linewidth=4)
     ax1.step(sigma_GS, depth_GS, 'r', label='GS')
-    ax1.step(sigma_Opt, depth_Opt, 'c', label='GI')
+    ax1.step(sigma_GN, depth_GN, 'c', label='GI')
     ax1.step(sigma_ini, depth_ini, 'g', label='Initial')
     ax1.set_xlim([10,2000])
     ax1.set_ylabel('Depth [m]', fontsize=8)
@@ -427,7 +428,7 @@ def Plot_SolSpa_sigma2(ax1, ax2, model, model_GS, model_GN, model_ini, model_his
     ax2.set(xlim=(xmin, xmax), ylim=(ymin, ymax))
     ax2.scatter(model[1]*1000, model[0], marker='o', c='w', label='True model', s=100)
     ax2.scatter(model_GS[1]*1000, model_GS[0], marker ='x', c='r', label='GS', s=100)
-    ax2.scatter(model_Opt[1]*1000, model_Opt[0], marker ='.', c='y', label='GN', s=100)
+    ax2.scatter(model_GN[1]*1000, model_GN[0], marker ='.', c='y', label='GN', s=100)
     ax2.scatter(model_ini[1]*1000, model_ini[0], marker ='.', c='k', label='Initial', s=100)
     # Plot update history
     for i in range(len(model_hist)+1):
@@ -438,7 +439,7 @@ def Plot_SolSpa_sigma2(ax1, ax2, model, model_GS, model_GN, model_ini, model_his
     ax2.set_ylabel('$h_1$ [m]', fontsize=8)
     ax2.legend(fontsize=7)
     ax2.tick_params(axis='both',labelsize=9)
-    ax2.set_title(method, fontsize=8)
+    #ax2.set_title(method, fontsize=8)
     ax2.set_xscale('log')
     
     if colorbar==True:
