@@ -15,7 +15,7 @@ import sys
 sys.path.insert(1, '../../src')
 
 # Import forward modelling classes for 2-layered models
-from EM1D import EMf_2Lay_Opt_HVP_1D, EMf_2Lay_Opt_HVP_Q_1D, EMf_2Lay_Opt_HVP_IP_1D
+from EM1D import EMf_2Lay_GN_HVP_1D, EMf_2Lay_GN_HVP_Q_1D, EMf_2Lay_GN_HVP_IP_1D
 
 # Import true models and data 
 model_A2_1 = np.load('models/model_synth_2Lay_A2_1.npy')
@@ -49,7 +49,7 @@ lam = 0
 error = 1e-3 
 
 # Define a position that you want to check the optimization history
-post_test = 10
+pos_test = 10
 
 # Defining inversion limits and transformations
 transThk = pg.trans.TransLogLU(0.1,7)
@@ -60,7 +60,7 @@ transSig = pg.trans.TransLogLU(10/1000,2000/1000)
 
 print('Estimating model A2-1 using Q+IP')
 # Initialize the forward modelling class 
-EMf = EMf_2Lay_Opt_HVP_1D(lambd, height, offsets, freq, filt, nlay=2)
+EMf = EMf_2Lay_GN_HVP_1D(lambd, height, offsets, freq, filt, nlay=2)
 
 # Define transformation
 EMf.region(0).setTransModel(transThk)
@@ -90,7 +90,7 @@ print('End')
 
 print('Estimating model A2-1 using Q')
 # Initialize the forward modelling class 
-EMf = EMf_2Lay_Opt_HVP_Q_1D(lambd, height, offsets, freq, filt, nlay=2)
+EMf = EMf_2Lay_GN_HVP_Q_1D(lambd, height, offsets, freq, filt, nlay=2)
 
 # Define transformation
 EMf.region(0).setTransModel(transThk)
@@ -120,7 +120,7 @@ print('End')
 
 print('Estimating model A2-1 using IP')
 # Initialize the forward modelling class 
-EMf = EMf_2Lay_Opt_HVP_IP_1D(lambd, height, offsets, freq, filt, nlay=2)
+EMf = EMf_2Lay_GN_HVP_IP_1D(lambd, height, offsets, freq, filt, nlay=2)
 
 # Define transformation
 EMf.region(0).setTransModel(transThk)
@@ -151,7 +151,7 @@ print('End')
 
 print('Estimating model A2-2 using Q+IP')
 # Initialize the forward modelling class 
-EMf = EMf_2Lay_Opt_HVP_1D(lambd, height, offsets, freq, filt, nlay=2)
+EMf = EMf_2Lay_GN_HVP_1D(lambd, height, offsets, freq, filt, nlay=2)
 
 # Define transformation
 EMf.region(0).setTransModel(transThk)
@@ -181,7 +181,7 @@ print('End')
 
 print('Estimating model A2-2 using Q')
 # Initialize the forward modelling class 
-EMf = EMf_2Lay_Opt_HVP_Q_1D(lambd, height, offsets, freq, filt, nlay=2)
+EMf = EMf_2Lay_GN_HVP_Q_1D(lambd, height, offsets, freq, filt, nlay=2)
 
 # Define transformation
 EMf.region(0).setTransModel(transThk)
@@ -211,7 +211,7 @@ print('End')
 
 print('Estimating model A2-2 using IP')
 # Initialize the forward modelling class 
-EMf = EMf_2Lay_Opt_HVP_IP_1D(lambd, height, offsets, freq, filt, nlay=2)
+EMf = EMf_2Lay_GN_HVP_IP_1D(lambd, height, offsets, freq, filt, nlay=2)
 
 # Define transformation
 EMf.region(0).setTransModel(transThk)
@@ -242,7 +242,7 @@ print('End')
 
 print('Estimating model A2-3 using Q+IP')
 # Initialize the forward modelling class 
-EMf = EMf_2Lay_Opt_HVP_1D(lambd, height, offsets, freq, filt, nlay=2)
+EMf = EMf_2Lay_GN_HVP_1D(lambd, height, offsets, freq, filt, nlay=2)
 
 # Define transformation
 EMf.region(0).setTransModel(transThk)
@@ -272,7 +272,7 @@ print('End')
 
 print('Estimating model A2-3 using Q')
 # Initialize the forward modelling class 
-EMf = EMf_2Lay_Opt_HVP_Q_1D(lambd, height, offsets, freq, filt, nlay=2)
+EMf = EMf_2Lay_GN_HVP_Q_1D(lambd, height, offsets, freq, filt, nlay=2)
 
 # Define transformation
 EMf.region(0).setTransModel(transThk)
@@ -302,7 +302,7 @@ print('End')
 
 print('Estimating model A2-3 using IP')
 # Initialize the forward modelling class 
-EMf = EMf_2Lay_Opt_HVP_IP_1D(lambd, height, offsets, freq, filt, nlay=2)
+EMf = EMf_2Lay_GN_HVP_IP_1D(lambd, height, offsets, freq, filt, nlay=2)
 
 # Define transformation
 EMf.region(0).setTransModel(transThk)
@@ -333,7 +333,7 @@ print('End')
 
 print('Estimating model A2-4 using Q+IP')
 # Initialize the forward modelling class 
-EMf = EMf_2Lay_Opt_HVP_1D(lambd, height, offsets, freq, filt, nlay=2)
+EMf = EMf_2Lay_GN_HVP_1D(lambd, height, offsets, freq, filt, nlay=2)
 
 # Define transformation
 EMf.region(0).setTransModel(transThk)
@@ -363,7 +363,7 @@ print('End')
 
 print('Estimating model A2-4 using Q')
 # Initialize the forward modelling class 
-EMf = EMf_2Lay_Opt_HVP_Q_1D(lambd, height, offsets, freq, filt, nlay=2)
+EMf = EMf_2Lay_GN_HVP_Q_1D(lambd, height, offsets, freq, filt, nlay=2)
 
 # Define transformation
 EMf.region(0).setTransModel(transThk)
@@ -389,11 +389,11 @@ for pos in range(npos):
         mod_hist_Q_A2_4 = invEM.modelHistory
 print('End')
 
-# Optimization IP
+# Gauss-Newton IP
 
 print('Estimating model A2-4 using IP')
 # Initialize the forward modelling class 
-EMf = EMf_2Lay_Opt_HVP_IP_1D(lambd, height, offsets, freq, filt, nlay=2)
+EMf = EMf_2Lay_GN_HVP_IP_1D(lambd, height, offsets, freq, filt, nlay=2)
 
 # Define transformation
 EMf.region(0).setTransModel(transThk)
