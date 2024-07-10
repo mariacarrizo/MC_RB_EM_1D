@@ -1,7 +1,14 @@
-### Code that creates searches in Lookup table for the indices of best data fit 
-### (min data misfit) for 3-layered 1D models using noisy data 2.5 %
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+""" 
+Script Name: 7_GlobalSearch_B1_n2.py
+Description: Script to perform Global Search for B1 cases in 2.5% noise presence
+Author: @mariacarrizo
+Email: m.e.carrizomascarell@tudelft.nl
+Date created: 17/12/2023
+"""
 
-## Import libraries
+# Import libraries
 import numpy as np
 import time
 from joblib import Parallel, delayed
@@ -23,7 +30,7 @@ nsl = len(conds) # number of samples
 # Load lookup table
 LUT = np.load('../data/LUTable_3Lay.npy')
 
-## Load true synthetic model and data
+## Load data with noise included
 data_n2_B1_1 = np.load('data/data_n2_B1_1.npy')
 data_n2_B1_2 = np.load('data/data_n2_B1_2.npy')
 data_n2_B1_3 = np.load('data/data_n2_B1_3.npy')

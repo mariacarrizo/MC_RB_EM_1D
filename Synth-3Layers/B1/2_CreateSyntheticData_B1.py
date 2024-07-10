@@ -1,4 +1,12 @@
-# Script to simulate synthetic data for case B.1
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+""" 
+Script Name: 2_CreateSyntheticData_B1.py
+Description: Script to create synthetic models in B1 cases
+Author: @mariacarrizo
+Email: m.e.carrizomascarell@tudelft.nl
+Date created: 16/12/2023
+"""
 
 # Import libraries
 import numpy as np
@@ -36,9 +44,10 @@ sigmas_B1_4 = np.ones((npos, nlayer))*sig_ini_B1_4
 x = np.linspace(0, 20, npos)[:,None]
 
 #  Thicknesses in m
-thk1 = np.ones_like(x)*3
-thk2 = np.ones_like(x) + x/10 +.6
+thk1 = np.ones_like(x)*3           # First layer
+thk2 = np.ones_like(x) + x/10 +.6  # Second layer
 
+# Define synthetic models
 model_B1_1 = np.hstack((thk1, thk2, sigmas_B1_1))
 model_B1_2 = np.hstack((thk1, thk2, sigmas_B1_2))
 model_B1_3 = np.hstack((thk1, thk2, sigmas_B1_3))
