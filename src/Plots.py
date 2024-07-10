@@ -22,6 +22,12 @@ from pygimli.utils import rndig
 from pygimli.viewer.mpl import setMappableData
 from pygimli.viewer.mpl import updateAxes as updateAxes_
 
+import sys
+sys.path.insert(1, '../../src')
+
+# Import functions
+from EM1D import EMf_3Lay_HVP, nrmse
+
 def showStitchedModels(models, ax=None, x=None, cMin=None, cMax=None, thk=None,
                        logScale=True, title=None, zMin=0, zMax=0, zLog=False,
                        **kwargs):
@@ -813,4 +819,538 @@ def Plot_Models_Noise(model_true, model_GS_n2, model_GS_n5, model_GS_n10,
     ax[7,2].tick_params(labelsize=fs)
     ax[7,2].set_xlabel('Distance [m]', fontsize=fs)
 
+    plt.tight_layout()
+
+def Plot_Models_3Lay_QIP(model_true, model_GS, model_GN, data_true, data_GS, data_GN, x, z1, z2, case=''):
+
+    inputs1 = {
+        'cMin':10,
+        'cMax':1800,
+        'zMax':8,
+        'cMap':'Spectral_r',
+        'colorBar':False, 
+    }
+
+    inputs2 = {
+        'cMin':10,
+        'cMax':1800,
+        'zMax':8,
+        'cMap':'Spectral_r',
+        'colorBar':True, 
+        'orientation':'vertical',
+        'label': '$\sigma$ [mS/m]',
+        'fontsize':7, 
+        'labelsize':7
+    }
+    
+    fs=8
+    fs2=10
+    fig, ax = plt.subplots(5,2,  sharex=True,  figsize=(7,7), layout='constrained')
+
+    showStitchedModels(model_true, ax = ax[0,0], **inputs1)
+
+    fig.delaxes(ax[0,1])
+    p = ax[0,0].get_position().get_points()
+    x0, y0 = p[0]
+    x1, y1 = p[1]
+    ax[0,0].set_position([x0 + (x1)/2, y0+0.06, (x1-x0) , y1-y0])
+    ax[0,0].set_title('True model', fontsize=fs2)
+    ax[0,0].set_ylabel('Depth [m]', fontsize=fs)
+    ax[0,0].tick_params(labelsize=fs)
+    ax[0,0].text(-10,0.5, 'Case ' + case +' [Q+IP]')
+    
+    showStitchedModels(model_GS, ax = ax[1,0], **inputs1)
+    ax[1,0].plot(x,-z1,':k')
+    ax[1,0].plot(x,-z1-z2,':k')
+    ax[1,0].set_ylabel('Depth [m]', fontsize=fs)
+    ax[1,0].text(0,-6, 'RMSE $\sigma$: %2.3f' % root_mean_squared_error(model_true[:,2:], model_GS[:,2:]) + ' mS/m', fontsize=fs)
+    ax[1,0].text(0,-7, 'RMSE $h$: %2.3f' % root_mean_squared_error(model_true[:,:2], model_GS[:,:2]) + ' m', fontsize=fs)
+    ax[1,0].tick_params(labelsize=fs)
+    ax[1,0].set_title('Estimated model - GS', fontsize=fs2)
+    
+    showStitchedModels(model_GN, ax = ax[1,1], **inputs2)
+    #ax[1,1].set_ylabel('Depth [m]')
+    ax[1,1].plot(x,-z1,':k')
+    ax[1,1].plot(x,-z1-z2,':k')
+    ax[1,1].text(0,-6, 'RMSE $\sigma$: %2.3f' % root_mean_squared_error(model_true[:,2:], model_GN[:,2:]) + ' mS/m', fontsize=fs)
+    ax[1,1].text(0,-7, 'RMSE $h$: %2.3f' % root_mean_squared_error(model_true[:,:2], model_GN[:,:2]) + ' m', fontsize=fs)  
+    ax[1,1].tick_params(labelsize=fs)
+    ax[1,1].set_title('Estimated model - GN', fontsize=fs2)
+    
+    model_true_grid = grid(model_true)
+    model_GS_grid = grid(model_GS)
+    model_GN_grid = grid(model_GN)
+    
+    diff_GS = 100*np.abs(model_true_grid - model_GS_grid)/model_true_grid
+    diff_GN = 100*np.abs(model_true_grid - model_GN_grid)/model_true_grid
+    
+    ax[2,0].imshow(diff_GS.T, extent=[-1,20, -8,0], norm=colors.LogNorm(vmin=0.1, vmax=100), cmap = 'binary', aspect='auto')
+    ax[2,0].plot(x,-z1,':r')
+    ax[2,0].plot(x,-z1-z2,':r')
+    ax[2,0].set_ylabel('Depth [m]', fontsize=fs)
+    ax[2,0].set_title('Relative difference % - GS', fontsize=fs2)
+    ax[2,0].tick_params(labelsize=fs)
+    
+    dc = ax[2,1].imshow(diff_GN.T, extent=[-1,20, -8,0], norm=colors.LogNorm(vmin=0.1, vmax=100), cmap = 'binary', aspect='auto')
+    ax[2,1].plot(x,-z1,':r')
+    ax[2,1].plot(x,-z1-z2,':r')
+    ax[2,1].set_title('Relative difference % - GN', fontsize=fs2)
+    ax[2,1].tick_params(labelsize=fs)
+    cb = fig.colorbar(dc, ax=ax[2,1], location='right', )#pad=1e-9)
+    cb.set_label('Rel. Difference %', fontsize=fs)
+    cb.ax.tick_params(labelsize=7)
+
+    plot_Data(data_true, data_GS, ax=ax[3,0], ylab=True,)  
+    ax[3,0].set_title('Quadrature - GS - RMSE: %2.3f' % root_mean_squared_error(data_true[:,:9], data_GS[:,:9]) + ' ppt', fontsize=fs2)
+    ax[3,0].tick_params(labelsize=fs)
+    
+    plot_Data(data_true, data_GN, ax=ax[3,1], )
+    ax[3,1].set_title('Quadrature - GN - RMSE: %2.3f' % root_mean_squared_error(data_true[:,:9], data_GN[:,:9]) + ' ppt', fontsize=fs2)
+    ax[3,1].tick_params(labelsize=fs)
+    
+    plot_Data(data_true[:, 9:], data_GS[:, 9:], ax=ax[4,0], ylab=True, ylabel='IP')
+    ax[4,0].set_xlabel('Distance [m]', fontsize=fs)
+    ax[4,0].set_title('In Phase - GS - RMSE: %2.3f' % root_mean_squared_error(data_true[:,9:], data_GS[:,9:]) + ' ppt', fontsize=fs2)
+    ax[4,0].tick_params(labelsize=fs)
+ 
+    plot_Data(data_true[:, 9:], data_GN[:, 9:], ax=ax[4,1], )
+    ax[4,1].set_xlabel('Distance [m]', fontsize=fs)
+    ax[4,1].set_title('In Phase - GN - RMSE: %2.3f' % root_mean_squared_error(data_true[:,9:], data_GN[:,9:]) + ' ppt', fontsize=fs2)
+    ax[4,1].tick_params(labelsize=fs)
+
+    handles, labels = ax[3,1].get_legend_handles_labels()
+    
+    fig.legend(handles, labels, loc='lower right', fontsize=fs, bbox_to_anchor=(1.03, 0) ) 
+    
+def Plot_Models_3Lay(model_true, model_GS, model_GN, data_true, data_GS, data_GN, x, z1, z2, data_type = '', case='' ):
+
+    inputs1 = {
+        'colorBar':False,
+        'cMin':10,
+        'cMax':1800,
+        'zMax':8,
+        'cMap':'Spectral_r',
+        'labelsize':7
+    }
+
+    inputs2 = {
+        'cMin':10,
+        'cMax':1800,
+        'zMax':8,
+        'cMap':'Spectral_r',
+        'colorBar':True, 
+        'orientation':'vertical',
+        'label': '$\sigma$ [mS/m]',
+        'fontsize':7, 
+        'labelsize':7
+    }
+    
+    fs=8
+    fs2=10
+    fig, ax = plt.subplots(3,2,  sharex=True,)
+
+    showStitchedModels(model_GS, ax = ax[0,0], **inputs1)
+    ax[0,0].set_ylabel('Depth [m]', fontsize=fs)
+    ax[0,0].text(0,-6, 'RMSE $\sigma$: %2.3f' % root_mean_squared_error(model_true[:,2:], model_GS[:,2:]) + ' mS/m', fontsize=fs)
+    ax[0,0].text(0,-7, 'RMSE $h$: %2.3f' % root_mean_squared_error(model_true[:,:2], model_GS[:,:2]) + ' m', fontsize=fs)
+    ax[0,0].tick_params(labelsize=fs)
+    ax[0,0].set_title('Estimated model GS', fontsize=fs2)
+    ax[0,0].text(-4,0.7, 'Case ' + case)
+    ax[0,0].plot(x,-z1,':k')
+    ax[0,0].plot(x,-z1-z2,':k')
+    
+    model_true_grid = grid(model_true)
+    model_GS_grid = grid(model_GS)
+    model_GN_grid = grid(model_GN)
+    
+    diff_GS = 100*np.abs(model_true_grid - model_GS_grid)/model_true_grid
+    diff_GN = 100*np.abs(model_true_grid - model_GN_grid)/model_true_grid
+    
+    ax[1,0].imshow(diff_GS.T, extent=[-1,20, -8,0], norm=colors.LogNorm(vmin=1, vmax=100), cmap = 'binary', aspect='auto')
+    ax[1,0].set_ylabel('Depth [m]', fontsize=fs)
+    ax[1,0].set_title('Relative difference % - GS', fontsize=fs2)
+    ax[1,0].tick_params(labelsize=fs)
+    ax[1,0].plot(x,-z1,':r')
+    ax[1,0].plot(x,-z1-z2,':r')
+    
+    dc = ax[1,1].imshow(diff_GN.T, extent=[-1,20, -8,0], norm=colors.LogNorm(vmin=0.1, vmax=100), cmap = 'binary', aspect='auto')
+    ax[1,1].set_title('Relative difference % - GN', fontsize=fs2)
+    ax[1,1].tick_params(labelsize=fs)
+    ax[1,1].plot(x,-z1,':r')
+    ax[1,1].plot(x,-z1-z2,':r')
+    #cb = fig.colorbar(dc, ax=ax[1,1], location='right', )#pad=1e-9)
+    #cb.set_label('Rel. Difference %', fontsize=fs)
+    #cb.ax.tick_params(labelsize=fs)
+
+    if data_type == 'Quadrature':
+        yl = 'Q'
+    else:
+        yl = 'IP'
+
+    plot_Data(data_true, data_GS, ax=ax[2,0], ylab=True, ylabel=yl)
+    ax[2,0].set_title(data_type + ' - GS - RMSE: %2.3f' % root_mean_squared_error(data_true, data_GS) + ' ppt', fontsize=fs2)
+    ax[2,0].set_xlabel('Distance [m]', fontsize=fs)
+    ax[2,0].tick_params(labelsize=fs)
+    
+    showStitchedModels(model_GN, ax = ax[0,1], **inputs1)
+    ax[0,1].text(0,-6, 'RMSE $\sigma$: %2.3f' % root_mean_squared_error(model_true[:,2:], model_GN[:,2:]) + ' mS/m', fontsize=fs)
+    ax[0,1].text(0,-7, 'RMSE $h$: %2.3f' % root_mean_squared_error(model_true[:,:2], model_GN[:,:2]) + ' m', fontsize=fs)  
+    ax[0,1].tick_params(labelsize=fs)
+    ax[0,1].set_title('Estimated model GN', fontsize=fs2)
+    ax[0,1].plot(x,-z1,':k')
+    ax[0,1].plot(x,-z1-z2,':k')
+    
+    plot_Data(data_true, data_GN, ax=ax[2,1],)
+    ax[2,1].set_title(data_type +' - GN - RMSE: %2.3f' % root_mean_squared_error(data_true, data_GN) + ' ppt', fontsize=fs2)
+    ax[2,1].set_xlabel('Distance [m]', fontsize=fs)
+    ax[2,1].tick_params(labelsize=fs)
+    
+    plt.tight_layout()
+
+    handles, labels = ax[2,0].get_legend_handles_labels()
+    fig.legend(handles, labels, loc='lower center', fontsize=fs, ncol=6, bbox_to_anchor=(0.5, -0.1) ) 
+    
+def Plot_Noise_3Lay(model_true, model_GS_n2, model_GS_n5, model_GS_n10, model_GN_n2, model_GN_n5, model_GN_n10,
+                    data_true, data_GS_n2, data_GS_n5, data_GS_n10, data_GN_n2, data_GN_n5, data_GN_n10, x, z1, z2):
+    inputs1 = {
+        'colorBar':False,
+        'cMin':10,
+        'cMax':1800,
+        'zMax':8,
+        'cMap':'Spectral_r',
+    }
+
+    inputs2 = {
+        'cMin':10,
+        'cMax':1800,
+        'zMax':8,
+        'cMap':'Spectral_r',
+        'colorBar':True, 
+        'orientation':'vertical',
+        'label': 'Elec. cond. [mS/m]'
+    }
+
+    fs=8
+    fs2=10
+    fig, ax = plt.subplots(8,3, sharex=True, figsize = (9,12))
+
+    showStitchedModels(model_GS_n2, ax=ax[0,0], **inputs1)
+    ax[0,0].text(0,-6, 'RMSE $\sigma$: %2.2f' % root_mean_squared_error(model_true[:,2:], model_GS_n2[:,2:]) + ' mS/m', fontsize = fs)
+    ax[0,0].text(0,-7, 'RMSE $h$: %2.2f' % root_mean_squared_error(model_true[:,:2], model_GS_n2[:,:2]) + ' m', fontsize = fs)
+    ax[0,0].set_title('Estimated model GS - Noise 2.5%', fontsize=fs2)
+    ax[0,0].set_ylabel('Depth [m]', fontsize=fs)
+    ax[0,0].tick_params(labelsize=fs)
+    ax[0,0].plot(x, -z1, ':k')
+    ax[0,0].plot(x, -z1-z2, ':k')
+    
+    showStitchedModels(model_GS_n5, ax=ax[0,1], **inputs1)
+    ax[0,1].text(0,-6, 'RMSE $\sigma$: %2.2f' % root_mean_squared_error(model_true[:,2:], model_GS_n5[:,2:]) + ' mS/m', fontsize = fs)
+    ax[0,1].text(0,-7, 'RMSE $h$: %2.2f' % root_mean_squared_error(model_true[:,:2], model_GS_n5[:,:2]) + ' m', fontsize = fs)
+    ax[0,1].set_title('Estimated model GS - Noise 5%', fontsize=fs2)
+    ax[0,1].tick_params(labelsize=fs)
+    ax[0,1].plot(x, -z1, ':k')
+    ax[0,1].plot(x, -z1-z2, ':k')
+    
+    showStitchedModels(model_GS_n10, ax=ax[0,2], **inputs1)
+    ax[0,2].text(0,-6, 'RMSE $\sigma$: %2.2f' % root_mean_squared_error(model_true[:,2:], model_GS_n10[:,2:]) + ' mS/m', fontsize = fs)
+    ax[0,2].text(0,-7, 'RMSE $h$: %2.2f' % root_mean_squared_error(model_true[:,:2], model_GS_n10[:,:2]) + ' m', fontsize = fs)
+    ax[0,2].set_title('Estimated model GS - Noise 10%', fontsize=fs2)
+    ax[0,2].tick_params(labelsize=fs)
+    ax[0,2].plot(x, -z1, ':k')
+    ax[0,2].plot(x, -z1-z2, ':k')
+    
+    # Rel diff  
+    model_true_grid = grid(model_true)
+    model_GS_n2_grid = grid(model_GS_n2)
+    model_GS_n5_grid = grid(model_GS_n5)
+    model_GS_n10_grid = grid(model_GS_n10)
+    model_GN_n2_grid = grid(model_GN_n2)
+    model_GN_n5_grid = grid(model_GN_n5)
+    model_GN_n10_grid = grid(model_GN_n10)
+    
+    diff_GS_n2 = 100*np.abs(model_true_grid - model_GS_n2_grid)/model_true_grid
+    diff_GS_n5 = 100*np.abs(model_true_grid - model_GS_n5_grid)/model_true_grid
+    diff_GS_n10 = 100*np.abs(model_true_grid - model_GS_n10_grid)/model_true_grid
+    
+    diff_GN_n2 = 100*np.abs(model_true_grid - model_GN_n2_grid)/model_true_grid
+    diff_GN_n5 = 100*np.abs(model_true_grid - model_GN_n5_grid)/model_true_grid
+    diff_GN_n10 = 100*np.abs(model_true_grid - model_GN_n10_grid)/model_true_grid
+    
+    ax[1,0].imshow(diff_GS_n2.T, extent=[-1,20, -8,0], norm=colors.LogNorm(vmin=1, vmax=100), cmap = 'binary', aspect='auto')
+    ax[1,0].set_ylabel('Rel diff %', fontsize=fs)
+    ax[1,0].tick_params(labelsize=fs)
+    ax[1,0].plot(x, -z1, ':r')
+    ax[1,0].plot(x, -z1-z2, ':r')
+    ax[1,0].set_title('Rel. difference % - GS', fontsize=fs2)
+    ax[1,1].imshow(diff_GS_n5.T, extent=[-1,20, -8,0], norm=colors.LogNorm(vmin=1, vmax=100), cmap = 'binary', aspect='auto')
+    ax[1,1].tick_params(labelsize=fs)
+    ax[1,1].plot(x, -z1, ':r')
+    ax[1,1].plot(x, -z1-z2, ':r')
+    ax[1,1].set_title('Rel. difference % - GS', fontsize=fs2)
+    ax[1,2].imshow(diff_GS_n10.T, extent=[-1,20, -8,0], norm=colors.LogNorm(vmin=1, vmax=100), cmap = 'binary', aspect='auto')
+    ax[1,2].tick_params(labelsize=fs)
+    ax[1,2].set_title('Rel. difference % - GS', fontsize=fs2)
+    ax[1,2].plot(x, -z1, ':r')
+    ax[1,2].plot(x, -z1-z2, ':r')
+    
+    plot_Data(data_true[:,:9], data_GS_n2[:,:9], ax=ax[2,0])
+    ax[2,0].set_title('Quadrature - GS - RMSE: %2.2f' % root_mean_squared_error(data_true[:,:9], data_GS_n2[:,:9]) + ' ppt', fontsize=fs2)
+    ax[2,0].set_ylabel('[ppt]', fontsize=fs)
+    ax[2,0].tick_params(labelsize=fs)
+    plot_Data(data_true[:,:9], data_GS_n5[:,:9], ax=ax[2,1])
+    ax[2,1].set_title('Quadrature - GS - RMSE: %2.2f' % root_mean_squared_error(data_true[:,:9], data_GS_n5[:,:9]) + ' ppt', fontsize=fs2)
+    ax[2,1].tick_params(labelsize=fs)
+    plot_Data(data_true[:,:9], data_GS_n10[:,:9], ax=ax[2,2])
+    ax[2,2].set_title('Quadrature - GS - RMSE: %2.2f' % root_mean_squared_error(data_true[:,:9], data_GS_n10[:,:9]) + ' ppt', fontsize=fs2)
+    ax[2,2].tick_params(labelsize=fs)
+
+    plot_Data(data_true[:,9:], data_GS_n2[:,9:], ax=ax[3,0])
+    ax[3,0].set_ylabel('[ppt]', fontsize=fs)
+    ax[3,0].set_title('In Phase - GS - RMSE: %2.2f' % root_mean_squared_error(data_true[:,9:], data_GS_n2[:,9:]) + ' ppt', fontsize=fs2)
+    ax[3,0].tick_params(labelsize=fs)
+    plot_Data(data_true[:,9:], data_GS_n5[:,9:], ax=ax[3,1])
+    ax[3,1].set_title('In Phase - GS - RMSE: %2.2f' % root_mean_squared_error(data_true[:,9:], data_GS_n5[:,9:]) + ' ppt', fontsize=fs2)
+    ax[3,1].tick_params(labelsize=fs)
+    plot_Data(data_true[:,9:], data_GS_n10[:,9:], ax=ax[3,2])
+    ax[3,2].set_title('In Phase - GS - RMSE: %2.2f' % root_mean_squared_error(data_true[:,9:], data_GS_n10[:,9:]) + ' ppt', fontsize=fs2)
+    ax[3,2].tick_params(labelsize=fs)
+    
+    showStitchedModels(model_GN_n2, ax=ax[4,0], **inputs1)
+    ax[4,0].text(0,-6, 'RMSE $\sigma$: %2.2f' % root_mean_squared_error(model_true[:,2:], model_GN_n2[:,2:]) + ' mS/m', fontsize = fs)
+    ax[4,0].text(0,-7, 'RMSE $h$: %2.2f' % root_mean_squared_error(model_true[:,:2], model_GN_n2[:,:2]) + ' m', fontsize = fs)
+    ax[4,0].set_title('Estimated model GN - Noise 2.5%', fontsize=fs2)
+    ax[4,0].set_ylabel('Depth [m]', fontsize=fs)
+    ax[4,0].tick_params(labelsize=fs)
+    ax[4,0].plot(x, -z1, ':k')
+    ax[4,0].plot(x, -z1-z2, ':k')
+    
+    showStitchedModels(model_GN_n5, ax=ax[4,1], **inputs1)
+    ax[4,1].text(0,-6, 'RMSE $\sigma$: %2.2f' % root_mean_squared_error(model_true[:,2:], model_GN_n5[:,2:]) + ' mS/m', fontsize = fs)
+    ax[4,1].text(0,-7, 'RMSE $h$: %2.2f' % root_mean_squared_error(model_true[:,:2], model_GN_n5[:,:2]) + ' m', fontsize = fs)
+    ax[4,1].set_title('Estimated model GN - Noise 5%', fontsize=fs2)
+    ax[4,1].tick_params(labelsize=fs)
+    ax[4,1].plot(x, -z1, ':k')
+    ax[4,1].plot(x, -z1-z2, ':k')
+    
+    showStitchedModels(model_GN_n10, ax=ax[4,2], **inputs1)
+    ax[4,2].text(0,-6, 'RMSE $\sigma$: %2.2f' % root_mean_squared_error(model_true[:,2:], model_GN_n10[:,2:]) + ' mS/m', fontsize = fs)
+    ax[4,2].text(0,-7, 'RMSE $h$: %2.2f' % root_mean_squared_error(model_true[:,:2], model_GN_n10[:,:2]) + ' m', fontsize = fs)
+    ax[4,2].set_title('Estimated model GN - Noise 10%', fontsize=fs2)
+    ax[4,2].tick_params(labelsize=fs)
+    ax[4,2].plot(x, -z1, ':k')
+    ax[4,2].plot(x, -z1-z2, ':k')
+
+    # Rel diff
+    ax[5,0].imshow(diff_GN_n2.T, extent=[-1,20, -8,0], norm=colors.LogNorm(vmin=1, vmax=100), cmap = 'binary', aspect='auto')
+    ax[5,0].set_ylabel('Rel diff %', fontsize=fs)
+    ax[5,0].tick_params(labelsize=fs)
+    ax[5,0].set_title('Rel. difference % - Opt', fontsize=fs2)
+    ax[5,1].imshow(diff_GN_n5.T, extent=[-1,20, -8,0], norm=colors.LogNorm(vmin=1, vmax=100), cmap = 'binary', aspect='auto')
+    ax[5,1].tick_params(labelsize=fs)
+    ax[5,1].set_title('Rel. difference % - Opt', fontsize=fs2)
+    ax[5,2].imshow(diff_GN_n10.T, extent=[-1,20, -8,0], norm=colors.LogNorm(vmin=1, vmax=100), cmap = 'binary', aspect='auto')
+    ax[5,2].tick_params(labelsize=fs)
+    ax[5,2].set_title('Rel. difference % - Opt', fontsize=fs2)
+    
+    plot_Data(data_true[:,:9], data_GN_n2[:,:9], ax=ax[6,0])
+    ax[6,0].set_title('Quadrature - GN - RMSE: %2.2f' % root_mean_squared_error(data_true[:,:9], data_GN_n2[:,:9]) + ' ppt', fontsize=10)
+    ax[6,0].set_ylabel('[ppt]', fontsize=fs)
+    ax[6,0].tick_params(labelsize=fs)
+    plot_Data(data_true[:,:9], data_GN_n5[:,:9], ax=ax[6,1])
+    ax[6,1].set_title('Quadrature - GN - RMSE: %2.2f' % root_mean_squared_error(data_true[:,:9], data_GN_n5[:,:9]) + ' ppt', fontsize=10)
+    ax[6,1].tick_params(labelsize=fs)
+    plot_Data(data_true[:,:9], data_GN_n10[:,:9], ax=ax[6,2])
+    ax[6,2].set_title('Quadrature - GN - RMSE: %2.2f' % root_mean_squared_error(data_true[:,:9], data_GN_n10[:,:9]) + ' ppt', fontsize=10)
+    ax[6,2].tick_params(labelsize=fs)
+
+    plot_Data(data_true[:,9:], data_GN_n2[:,9:], ax=ax[7,0])
+    ax[7,0].set_ylabel('[ppt]', fontsize=fs)
+    ax[7,0].set_title('In Phase - GN - RMSE: %2.2f' % root_mean_squared_error(data_true[:,9:], data_GN_n2[:,9:]) + ' ppt', fontsize=10)
+    ax[7,0].tick_params(labelsize=fs)
+    ax[7,0].set_xlabel('Distance [m]', fontsize=fs)
+    plot_Data(data_true[:,9:], data_GN_n5[:,9:], ax=ax[7,1])
+    ax[7,1].set_title('In Phase - GN - RMSE: %2.2f' % root_mean_squared_error(data_true[:,9:], data_GN_n5[:,9:]) + ' ppt', fontsize=10)
+    ax[7,1].tick_params(labelsize=fs)
+    ax[7,1].set_xlabel('Distance [m]', fontsize=fs)
+    plot_Data(data_true[:,9:], data_GN_n10[:,9:], ax=ax[7,2])
+    ax[7,2].set_title('In Phase - GN - RMSE: %2.2f' % root_mean_squared_error(data_true[:,9:], data_GN_n10[:,9:]) + ' ppt', fontsize=10)
+    ax[7,2].tick_params(labelsize=fs)
+    ax[7,2].set_xlabel('Distance [m]', fontsize=fs)
+
+    plt.tight_layout()
+    
+def Plot_Models_GSGN(model_true, model_GS, model_GN, model_GSGN, x, z1, z2, case=''):
+
+    inputs1 = {
+        'cMin':10,
+        'cMax':1800,
+        'zMax':8,
+        'cMap':'Spectral_r',
+        'colorBar':False, 
+    }
+
+    inputs2 = {
+        'cMin':10,
+        'cMax':1800,
+        'zMax':8,
+        'cMap':'Spectral_r',
+        'colorBar':True, 
+        'orientation':'vertical',
+        'label': '$\sigma$ [mS/m]',
+        'fontsize':7, 
+        'labelsize':7
+    }
+    
+    
+    fs=8
+    fs2=10
+    fig, ax = plt.subplots(1,3, figsize=(8,2), sharey=True, layout='constrained')
+   
+    showStitchedModels(model_GS, ax = ax[0], **inputs1)
+    ax[0].plot(x,-z1,':k')
+    ax[0].plot(x,-z1-z2,':k')
+    ax[0].set_ylabel('Depth [m]', fontsize=fs)
+    ax[0].text(0,-6, 'RMSE $\sigma$: %2.3f' % root_mean_squared_error(model_true[:,2:], model_GS[:,2:]) + ' mS/m', fontsize=fs)
+    ax[0].text(0,-7, 'RMSE $h$: %2.3f' % root_mean_squared_error(model_true[:,:2], model_GS[:,:2]) + ' m', fontsize=fs)
+    ax[0].tick_params(labelsize=fs)
+    ax[0].set_title('Estimated model - GS [Q+IP]', fontsize=fs2)
+    ax[0].set_xlabel('Distance [m]', fontsize=fs)
+    
+    showStitchedModels(model_GN, ax = ax[1], **inputs1)
+    #ax[1,1].set_ylabel('Depth [m]')
+    ax[1].plot(x,-z1,':k')
+    ax[1].plot(x,-z1-z2,':k')
+    ax[1].text(0,-6, 'RMSE $\sigma$: %2.3f' % root_mean_squared_error(model_true[:,2:], model_GN[:,2:]) + ' mS/m', fontsize=fs)
+    ax[1].text(0,-7, 'RMSE $h$: %2.3f' % root_mean_squared_error(model_true[:,:2], model_GN[:,:2]) + ' m', fontsize=fs)  
+    ax[1].tick_params(labelsize=fs)
+    ax[1].set_title('Estimated model - GN [Q+IP]', fontsize=fs2)
+    ax[1].set_xlabel('Distance [m]', fontsize=fs)
+
+    showStitchedModels(model_GSGN, ax = ax[2], **inputs2)
+    #ax[1,1].set_ylabel('Depth [m]')
+    ax[2].plot(x,-z1,':k')
+    ax[2].plot(x,-z1-z2,':k')
+    ax[2].text(0,-6, 'RMSE $\sigma$: %2.3f' % root_mean_squared_error(model_true[:,2:], model_GSGN[:,2:]) + ' mS/m', fontsize=fs)
+    ax[2].text(0,-7, 'RMSE $h$: %2.3f' % root_mean_squared_error(model_true[:,:2], model_GSGN[:,:2]) + ' m', fontsize=fs)  
+    ax[2].tick_params(labelsize=fs)
+    ax[2].set_title('Estimated model - GS + GN [Q+IP]', fontsize=fs2)
+    ax[2].set_xlabel('Distance [m]', fontsize=fs)
+    
+def PlotModel(model, depths, ax=None, model_name=None, model_style='k', ylab=False, xlab=False, lw=1):
+    """ Plot a 1D model """
+    if ax is None:
+        fig, ax = plt.subplots()
+    fs=7
+    ax.step(model, depths, color=model_style, label=model_name, linewidth=lw)
+    ax.set_xscale('log')
+    if xlab == True:
+        ax.set_xlabel('Electrical conductivity [mS/m]', fontsize=fs)
+    if ylab == True:
+        ax.set_ylabel('Depth [m]', fontsize=fs)
+    if model_name is not None:
+        ax.legend(fontsize=fs, bbox_to_anchor=(1.1, 1.05))
+    ax.tick_params(labelsize=fs)
+    plt.tight_layout()
+
+    
+def Plot_m0(lambd, height, offsets, freq, filt, sigmas, models_m0, model_true, dmax=-10, ax=None, ylab=False, xlab=False, legend=False):
+    """ Plot the results of GN estimation with different m0 """
+    if ax is None:
+        fig, ax = plt.subplots()
+    fs=7
+    
+    for m in range(len(models_m0)):
+        color = (0.1*m, 0.5, 0.5)
+        mod = models_m0[m]
+        sigma_2Lay_plot = np.hstack((mod[2:], mod[-1]))
+        depths_2Lay_plot = np.hstack([0, -mod[0], -np.sum(mod[:2]), dmax])
+        data = EMf_3Lay_HVP(lambd, mod[2], mod[3], mod[4], mod[0], mod[1],
+                            height, offsets, freq, filt)
+        data_true = EMf_3Lay_HVP(lambd, model_true[2], model_true[3], model_true[4], model_true[0], model_true[1],
+                                 height, offsets, freq, filt)
+        rmse = nrmse(data_true, data)
+        if legend == True:
+            PlotModel(sigma_2Lay_plot, depths_2Lay_plot, ax=ax, model_style=color, model_name='$m_0: $' 
+                      + str(sigmas[m]) + ' mS/m' + ', nrmse: ' + '%.2f' %rmse)
+        else:
+            PlotModel(sigma_2Lay_plot, depths_2Lay_plot, ax=ax, model_style=color, )
+    sigma_true = np.hstack((model_true[2:], model_true[-1]))
+    depth_true = np.hstack([0, -model_true[0], -np.sum(model_true[:2]), dmax])
+    if legend == True:
+        PlotModel(sigma_true, depth_true, model_name='True', ax=ax, lw = 2)
+    else:
+        PlotModel(sigma_true, depth_true, ax=ax, lw=2)
+        
+def Plot_1DModel_3Lay(ax, model_true, model_GS, model_GN, model_ini, pos, 
+                  case='', method='', depthmax=-8, colorbar=False):
+    # Arrays to plot
+    depth_true = np.array([0, -model_true[0], -np.sum(model_true[:2]), depthmax])
+    depth_GS = np.array([0, -model_GS[0], -np.sum(model_GS[:2]), depthmax])
+    depth_GN = np.array([0, -model_GN[0], -np.sum(model_GN[:2]), depthmax])
+    depth_ini = np.array([0, -model_ini[0], -np.sum(model_ini[:2]), depthmax])
+
+    sigma_true = np.hstack([model_true[2:], model_true[-1]])
+    sigma_GS = np.hstack([model_GS[2:], model_GS[-1]])
+    sigma_GN = np.hstack([model_GN[2:], model_GN[-1]])
+    sigma_ini = np.hstack([model_ini[2:], model_ini[-1]])
+    
+    ax.step(sigma_true*1000, depth_true, 'k', label = 'True', linewidth=4)
+    ax.step(sigma_GS*1000, depth_GS, 'r', label='GS')
+    ax.step(sigma_GN*1000, depth_GN, 'c', label='GN')
+    ax.step(sigma_ini*1000, depth_ini, 'g', label='Initial')
+    ax.set_xlim([5,2500])
+    ax.set_ylabel('Depth [m]', fontsize=8)
+    ax.set_xlabel('$\sigma$ [mS/m]', fontsize=8)
+    ax.set_title('1D Model X=' +str(pos) + 'm - Case: '+case, fontsize=8)
+    ax.set_xscale('log')
+    ax.legend(bbox_to_anchor=(1.1, 1.05), fontsize=7)
+    ax.tick_params(axis='both',labelsize=9)
+    
+def Plot_SolSpa_3Lay(models_err, err, model_true, model_GS, model_GN, model_ini, model_GN_hist, pos, title=''):
+    fig = plt.figure()
+    ax = plt.axes(projection ='3d')
+
+    # Extract models from solution space where the lookup table model sigma_1 == estimated model sigma_1
+    index_s1 = models_err[:,2] == model_GS[pos,2]  # obtain indices
+    models_err = models_err[np.where(index_s1)[0]] # extract models from indices
+    err = err[np.where(index_s1)[0]] # extract error from indices
+
+    # Extract models from solution space where the lookup table model sigma_3 == estimated model sigma_3
+    index_s3 = models_err[:,4] == model_GS[pos,4]
+    models_err = models_err[np.where(index_s3)[0]]
+    err = err[np.where(index_s3)[0]]
+
+    # defining axes
+    x = np.log10(models_err[:,3]*1000) # log10(conductivity) of the second layer
+    y = models_err[:,0] # thickness of first layer
+    z = models_err[:,1] # thickness of second layer
+    c = err*100 # error values
+    
+    # Plot
+    cb = ax.scatter(x, y, z, c = c, s= 0.01, cmap="RdBu_r")
+    ax.scatter(np.log10(model_GS[pos,3]*1000), model_GS[pos,0], model_GS[pos,1], c='r', s=20, label='GS')
+    ax.scatter(np.log10(model_true[pos,3]*1000), model_true[pos,0], model_true[pos,1], c='k', s=20, label='True')
+    ax.scatter(np.log10(model_GN[pos,3]*1000), model_GN[pos,0], model_GN[pos,1], c='y', s=20, label='GN')
+    ax.scatter(np.log10(model_ini[3]*1000), model_ini[0], model_ini[1], c='g', s=20, label='Initial')
+    ax.legend(fontsize=7)
+    
+    # Plot optimization history
+    for i in range(len(model_GN_hist)):
+        if i >= 1:
+            m1 = model_GN_hist[i-1]
+            m2 = model_GN_hist[i]
+            x = np.log10(model_GN_hist[i-1:i+1,3]*1000)
+            y = model_GN_hist[i-1:i+1,0]
+            z = model_GN_hist[i-1:i+1,1]
+            ax.plot(x,y,z, ':k')
+    ax.view_init(30, 30,0)
+    ax.set_xlabel('$log_{10}$($\sigma_2$) [mS/m]')
+    ax.set_ylabel('$h_1$ [m]')
+    ax.set_zlabel('$h_2$ [m]')
+    ax.set_title(title)
+
+    clb = fig.colorbar(cb, ax=ax, ticks=[0, 5, 10, 15, 20, 25, 30], shrink=0.5)
+    clb.ax.set_title('NRMSE %', fontsize=7)
+    clb.ax.tick_params(labelsize=9)
+    plt.show()
     plt.tight_layout()
