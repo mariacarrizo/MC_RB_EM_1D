@@ -1,4 +1,12 @@
-# Script to perform gradient based inversion on 3-layered 1D models
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+""" 
+Script Name: 6_GaussNewton_B1.py
+Description: Script to perform Gauss-Newton inversion for B1 cases
+Author: @mariacarrizo
+Email: m.e.carrizomascarell@tudelft.nl
+Date created: 17/12/2023
+"""
 
 # import libraries
 import pygimli as pg
@@ -7,7 +15,7 @@ import sys
 sys.path.insert(1, '../../src')
 
 # Load forward modelling classes for 3-layered 1D models
-from EM1D import EMf_3Lay_Opt_HVP_1D, EMf_3Lay_Opt_HVP_Q_1D, EMf_3Lay_Opt_HVP_IP_1D
+from EM1D import EMf_3Lay_GN_HVP_1D, EMf_3Lay_GN_HVP_Q_1D, EMf_3Lay_GN_HVP_IP_1D
 
 # Import the conductivities and thicknesses used to create the LU table
 conds = np.load('../data/conds.npy')
@@ -35,24 +43,32 @@ freq = survey['freq']
 lambd = survey['lambd']
 filt = survey['filt']
 
+# Define initial model [h_1, h2, sigma_1, sigma_2, sigma_3] (sigmas in S/m)
 m0 = [3, 3, 100/1000, 100/1000, 100/1000]
+
+# Define regularization parameter (alpha in Equation 5)
 lam = 0
 
+# relative error for inversion class
+error = 1e-3 
+
+# Define a position that you want to check the optimization history
+pos_test = 10
+
+# Defining inversion limits and transformations
 transThk = pg.trans.TransLogLU(np.min(thick), np.max(thick))
 transSig = pg.trans.TransLogLU(np.min(conds), np.max(conds))
-#transData = pg.trans.TransLog()
 
 #%%
-# Optimization Q + IP
+# Gauss-Newton Q + IP
 
 print('Estimating model B1-1 using Q+IP')
 # Initialize the forward modelling class 
-EMf = EMf_3Lay_Opt_HVP_1D(lambd, height, offsets, freq, filt, nlay=3)
+EMf = EMf_3Lay_GN_HVP_1D(lambd, height, offsets, freq, filt, nlay=3)
 
 # Define transformation
 EMf.region(0).setTransModel(transThk)
 EMf.region(1).setTransModel(transSig)
-#EMf.transData = transData
 
 print('Initializing inversion')
 # Define inversion framework from pygimli
@@ -60,10 +76,8 @@ invEM = pg.Inversion()
 invEM.setForwardOperator(EMf) # set forward operator
 
 # Relative error array
-error = 1e-3 # relative error
 relativeError = np.ones_like(data_B1_1[0]) * error
-model_Opt_B1_1 = np.zeros_like(model_B1_1)
-#model_hist = []
+model_GN_B1_1 = np.zeros_like(model_B1_1)
 
 # Start inversion
 print('Run inversion')
@@ -71,25 +85,21 @@ print('Run inversion')
 for pos in range(npos):
     print('pos:', pos)
     dataE = data_B1_1[pos].copy()
-    model_Opt_pos = invEM.run(dataE, relativeError, startModel= m0, lam=lam, verbose=True)
-    if pos == 10:
-        model_hist = invEM.modelHistory
-    model_Opt_B1_1[pos] = model_Opt_pos
+    model_GN_pos = invEM.run(dataE, relativeError, startModel= m0, lam=lam, verbose=True)
+    if pos == pos_test:
+        model_hist_B1_1 = invEM.modelHistory
+    model_GN_B1_1[pos] = model_GN_pos
 print('End')
-np.save('results/model_Opt_B1_1', model_Opt_B1_1)
-np.save('results/model_Opt_B1_1_hist', model_hist)
 
-#%%
-# Optimization Q 
+# Gauss-Newton Q 
 
 print('Estimating model B1-1 using Q')
 # Initialize the forward modelling class 
-EMf = EMf_3Lay_Opt_HVP_Q_1D(lambd, height, offsets, freq, filt, nlay=3)
+EMf = EMf_3Lay_GN_HVP_Q_1D(lambd, height, offsets, freq, filt, nlay=3)
 
 # Define transformation
 EMf.region(0).setTransModel(transThk)
 EMf.region(1).setTransModel(transSig)
-#EMf.transData = transData
 
 print('Initializing inversion')
 # Define inversion framework from pygimli
@@ -97,31 +107,27 @@ invEM = pg.Inversion()
 invEM.setForwardOperator(EMf) # set forward operator
 
 # Relative error array
-error = 1e-3 # relative error
 relativeError = np.ones_like(data_B1_1[0, :9]) * error
-model_Opt_B1_1 = np.zeros_like(model_B1_1)
+model_GN_Q_B1_1 = np.zeros_like(model_B1_1)
 
 # Start inversion
 print('Run inversion')
 # Perform inversion for each 1D model 
 for pos in range(npos):
     dataE = data_B1_1[pos, :9].copy()
-    model_Opt_pos = invEM.run(dataE, relativeError, startModel= m0, lam=lam, verbose=False)
-    model_Opt_B1_1[pos] = model_Opt_pos
+    model_GN_pos = invEM.run(dataE, relativeError, startModel= m0, lam=lam, verbose=False)
+    model_GN_Q_B1_1[pos] = model_GN_pos
 print('End')
-np.save('results/model_Opt_Q_B1_1', model_Opt_B1_1)
-    
-#%%    
-# Optimization IP 
+
+# Gauss-Newton IP 
 
 print('Estimating model B1-1 using IP')
 # Initialize the forward modelling class 
-EMf = EMf_3Lay_Opt_HVP_IP_1D(lambd, height, offsets, freq, filt, nlay=3)
+EMf = EMf_3Lay_GN_HVP_IP_1D(lambd, height, offsets, freq, filt, nlay=3)
 
 # Define transformation
 EMf.region(0).setTransModel(transThk)
 EMf.region(1).setTransModel(transSig)
-#EMf.transData = transData
 
 print('Initializing inversion')
 # Define inversion framework from pygimli
@@ -129,31 +135,27 @@ invEM = pg.Inversion()
 invEM.setForwardOperator(EMf) # set forward operator
 
 # Relative error array
-error = 1e-3 # relative error
 relativeError = np.ones_like(data_B1_1[0, 9:]) * error
-model_Opt_B1_1 = np.zeros_like(model_B1_1)
+model_GN_IP_B1_1 = np.zeros_like(model_B1_1)
 
 # Start inversion
 print('Run inversion')
 # Perform inversion for each 1D model 
 for pos in range(npos):
     dataE = data_B1_1[pos, 9:].copy()
-    model_Opt_pos = invEM.run(dataE, relativeError, startModel= m0, lam=lam, verbose=False)
-    model_Opt_B1_1[pos] = model_Opt_pos
+    model_GN_pos = invEM.run(dataE, relativeError, startModel= m0, lam=lam, verbose=False)
+    model_GN_IP_B1_1[pos] = model_GN_pos
 print('End')
-np.save('results/model_Opt_IP_B1_1', model_Opt_B1_1)
 
-#%%
-# Optimization Q + IP
+# Gauss-Newton Q + IP
 
 print('Estimating model B1-2 using Q+IP')
 # Initialize the forward modelling class 
-EMf = EMf_3Lay_Opt_HVP_1D(lambd, height, offsets, freq, filt, nlay=3)
+EMf = EMf_3Lay_GN_HVP_1D(lambd, height, offsets, freq, filt, nlay=3)
 
 # Define transformation
 EMf.region(0).setTransModel(transThk)
 EMf.region(1).setTransModel(transSig)
-#EMf.transData = transData
 
 print('Initializing inversion')
 # Define inversion framework from pygimli
@@ -161,10 +163,8 @@ invEM = pg.Inversion()
 invEM.setForwardOperator(EMf) # set forward operator
 
 # Relative error array
-error = 1e-3 # relative error
 relativeError = np.ones_like(data_B1_2[0]) * error
-model_Opt_B1_2 = np.zeros_like(model_B1_2)
-#model_hist = []
+model_GN_B1_2 = np.zeros_like(model_B1_2)
 
 # Start inversion
 print('Run inversion')
@@ -172,25 +172,21 @@ print('Run inversion')
 for pos in range(npos):
     print('pos:', pos)
     dataE = data_B1_2[pos].copy()
-    model_Opt_pos = invEM.run(dataE, relativeError, startModel= m0, lam=lam, verbose=True)
-    model_Opt_B1_2[pos] = model_Opt_pos
-    if pos == 10:
-        model_hist = invEM.modelHistory
+    model_GN_pos = invEM.run(dataE, relativeError, startModel= m0, lam=lam, verbose=True)
+    model_GN_B1_2[pos] = model_GN_pos
+    if pos == pos_test:
+        model_hist_B1_2 = invEM.modelHistory
 print('End')
-np.save('results/model_Opt_B1_2', model_Opt_B1_2)
-np.save('results/model_Opt_B1_2_hist', model_hist)
 
-#%%
-# Optimization Q 
+# Gauss-Newton Q 
 
 print('Estimating model B1-2 using Q')
 # Initialize the forward modelling class 
-EMf = EMf_3Lay_Opt_HVP_Q_1D(lambd, height, offsets, freq, filt, nlay=3)
+EMf = EMf_3Lay_GN_HVP_Q_1D(lambd, height, offsets, freq, filt, nlay=3)
 
 # Define transformation
 EMf.region(0).setTransModel(transThk)
 EMf.region(1).setTransModel(transSig)
-#EMf.transData = transData
 
 print('Initializing inversion')
 # Define inversion framework from pygimli
@@ -198,31 +194,27 @@ invEM = pg.Inversion()
 invEM.setForwardOperator(EMf) # set forward operator
 
 # Relative error array
-error = 1e-3 # relative error
 relativeError = np.ones_like(data_B1_2[0, :9]) * error
-model_Opt_B1_2 = np.zeros_like(model_B1_2)
+model_GN_Q_B1_2 = np.zeros_like(model_B1_2)
 
 # Start inversion
 print('Run inversion')
 # Perform inversion for each 1D model 
 for pos in range(npos):
     dataE = data_B1_2[pos, :9].copy()
-    model_Opt_pos = invEM.run(dataE, relativeError, startModel= m0, lam=lam, verbose=False)
-    model_Opt_B1_2[pos] = model_Opt_pos
+    model_GN_pos = invEM.run(dataE, relativeError, startModel= m0, lam=lam, verbose=False)
+    model_GN_Q_B1_2[pos] = model_GN_pos
 print('End')
-np.save('results/model_Opt_Q_B1_2', model_Opt_B1_2)
-    
-#%%    
-# Optimization IP 
+
+# Gauss-Newton IP 
 
 print('Estimating model B1-2 using IP')
 # Initialize the forward modelling class 
-EMf = EMf_3Lay_Opt_HVP_IP_1D(lambd, height, offsets, freq, filt, nlay=3)
+EMf = EMf_3Lay_GN_HVP_IP_1D(lambd, height, offsets, freq, filt, nlay=3)
 
 # Define transformation
 EMf.region(0).setTransModel(transThk)
 EMf.region(1).setTransModel(transSig)
-#EMf.transData = transData
 
 print('Initializing inversion')
 # Define inversion framework from pygimli
@@ -230,33 +222,27 @@ invEM = pg.Inversion()
 invEM.setForwardOperator(EMf) # set forward operator
 
 # Relative error array
-error = 1e-3 # relative error
 relativeError = np.ones_like(data_B1_2[0, 9:]) * error
-model_Opt_B1_2 = np.zeros_like(model_B1_2)
+model_GN_IP_B1_2 = np.zeros_like(model_B1_2)
 
 # Start inversion
 print('Run inversion')
 # Perform inversion for each 1D model 
 for pos in range(npos):
     dataE = data_B1_2[pos, 9:].copy()
-    model_Opt_pos = invEM.run(dataE, relativeError, startModel= m0, lam=lam, verbose=False)
-    model_Opt_B1_2[pos] = model_Opt_pos
+    model_GN_pos = invEM.run(dataE, relativeError, startModel= m0, lam=lam, verbose=False)
+    model_GN_IP_B1_2[pos] = model_GN_pos
 print('End')
-np.save('results/model_Opt_IP_B1_2', model_Opt_B1_2)
 
-#%%
-# Optimization Q + IP
-
-m0 = [3, 3, 200/1000, 200/1000, 200/1000]
+# Gauss-Newton Q + IP
 
 print('Estimating model B1-3 using Q+IP')
 # Initialize the forward modelling class 
-EMf = EMf_3Lay_Opt_HVP_1D(lambd, height, offsets, freq, filt, nlay=3)
+EMf = EMf_3Lay_GN_HVP_1D(lambd, height, offsets, freq, filt, nlay=3)
 
 # Define transformation
 EMf.region(0).setTransModel(transThk)
 EMf.region(1).setTransModel(transSig)
-#EMf.transData = transData
 
 print('Initializing inversion')
 # Define inversion framework from pygimli
@@ -264,10 +250,8 @@ invEM = pg.Inversion()
 invEM.setForwardOperator(EMf) # set forward operator
 
 # Relative error array
-error = 1e-3 # relative error
 relativeError = np.ones_like(data_B1_3[0]) * error
-model_Opt_B1_3 = np.zeros_like(model_B1_3)
-#model_hist = []
+model_GN_B1_3 = np.zeros_like(model_B1_3)
 
 # Start inversion
 print('Run inversion')
@@ -275,25 +259,21 @@ print('Run inversion')
 for pos in range(npos):
     print('pos:', pos)
     dataE = data_B1_3[pos].copy()
-    model_Opt_pos = invEM.run(dataE, relativeError, startModel= m0, lam=lam, verbose=True)
-    model_Opt_B1_3[pos] = model_Opt_pos
-    if pos == 10:
-        model_hist = invEM.modelHistory
+    model_GN_pos = invEM.run(dataE, relativeError, startModel= m0, lam=lam, verbose=True)
+    model_GN_B1_3[pos] = model_GN_pos
+    if pos == pos_test:
+        model_hist_B1_3 = invEM.modelHistory
 print('End')
-np.save('results/model_Opt_B1_3', model_Opt_B1_3)
-np.save('results/model_Opt_B1_3_hist', model_hist)
 
-#%%
-# Optimization Q 
+# Gauss-Newton Q 
 
 print('Estimating model B1-3 using Q')
 # Initialize the forward modelling class 
-EMf = EMf_3Lay_Opt_HVP_Q_1D(lambd, height, offsets, freq, filt, nlay=3)
+EMf = EMf_3Lay_GN_HVP_Q_1D(lambd, height, offsets, freq, filt, nlay=3)
 
 # Define transformation
 EMf.region(0).setTransModel(transThk)
 EMf.region(1).setTransModel(transSig)
-#EMf.transData = transData
 
 print('Initializing inversion')
 # Define inversion framework from pygimli
@@ -301,31 +281,27 @@ invEM = pg.Inversion()
 invEM.setForwardOperator(EMf) # set forward operator
 
 # Relative error array
-error = 1e-3 # relative error
 relativeError = np.ones_like(data_B1_3[0, :9]) * error
-model_Opt_B1_3 = np.zeros_like(model_B1_3)
+model_GN_Q_B1_3 = np.zeros_like(model_B1_3)
 
 # Start inversion
 print('Run inversion')
 # Perform inversion for each 1D model 
 for pos in range(npos):
     dataE = data_B1_3[pos, :9].copy()
-    model_Opt_pos = invEM.run(dataE, relativeError, startModel= m0, lam=lam, verbose=False)
-    model_Opt_B1_3[pos] = model_Opt_pos
+    model_GN_pos = invEM.run(dataE, relativeError, startModel= m0, lam=lam, verbose=False)
+    model_GN_Q_B1_3[pos] = model_GN_pos
 print('End')
-np.save('results/model_Opt_Q_B1_3', model_Opt_B1_3)
-    
-#%%    
-# Optimization IP 
+
+# Gauss-Newton IP 
 
 print('Estimating model B1-3 using IP')
 # Initialize the forward modelling class 
-EMf = EMf_3Lay_Opt_HVP_IP_1D(lambd, height, offsets, freq, filt, nlay=3)
+EMf = EMf_3Lay_GN_HVP_IP_1D(lambd, height, offsets, freq, filt, nlay=3)
 
 # Define transformation
 EMf.region(0).setTransModel(transThk)
 EMf.region(1).setTransModel(transSig)
-#EMf.transData = transData
 
 print('Initializing inversion')
 # Define inversion framework from pygimli
@@ -333,32 +309,27 @@ invEM = pg.Inversion()
 invEM.setForwardOperator(EMf) # set forward operator
 
 # Relative error array
-error = 1e-3 # relative error
 relativeError = np.ones_like(data_B1_3[0, 9:]) * error
-model_Opt_B1_3 = np.zeros_like(model_B1_3)
+model_GN_IP_B1_3 = np.zeros_like(model_B1_3)
 
 # Start inversion
 print('Run inversion')
 # Perform inversion for each 1D model 
 for pos in range(npos):
     dataE = data_B1_3[pos, 9:].copy()
-    model_Opt_pos = invEM.run(dataE, relativeError, startModel= m0, lam=lam, verbose=False)
-    model_Opt_B1_3[pos] = model_Opt_pos
+    model_GN_pos = invEM.run(dataE, relativeError, startModel= m0, lam=lam, verbose=False)
+    model_GN_IP_B1_3[pos] = model_GN_pos
 print('End')
-np.save('results/model_Opt_IP_B1_3', model_Opt_B1_3)
 
-#%%
-# Optimization Q + IP
-m0 = [3, 3, 400/1000, 400/1000, 400/1000]
+# Gauss-Newton Q + IP
 
 print('Estimating model B1-4 using Q+IP')
 # Initialize the forward modelling class 
-EMf = EMf_3Lay_Opt_HVP_1D(lambd, height, offsets, freq, filt, nlay=3)
+EMf = EMf_3Lay_GN_HVP_1D(lambd, height, offsets, freq, filt, nlay=3)
 
 # Define transformation
 EMf.region(0).setTransModel(transThk)
 EMf.region(1).setTransModel(transSig)
-#EMf.transData = transData
 
 print('Initializing inversion')
 # Define inversion framework from pygimli
@@ -366,10 +337,8 @@ invEM = pg.Inversion()
 invEM.setForwardOperator(EMf) # set forward operator
 
 # Relative error array
-error = 1e-3 # relative error
 relativeError = np.ones_like(data_B1_4[0]) * error
-model_Opt_B1_4 = np.zeros_like(model_B1_4)
-#model_hist = []
+model_GN_B1_4 = np.zeros_like(model_B1_4)
 
 # Start inversion
 print('Run inversion')
@@ -377,25 +346,21 @@ print('Run inversion')
 for pos in range(npos):
     print('pos:', pos)
     dataE = data_B1_4[pos].copy()
-    model_Opt_pos = invEM.run(dataE, relativeError, startModel= m0, lam=lam, verbose=True)
-    model_Opt_B1_4[pos] = model_Opt_pos
-    if pos == 10:
-        model_hist = invEM.modelHistory
+    model_GN_pos = invEM.run(dataE, relativeError, startModel= m0, lam=lam, verbose=True)
+    model_GN_B1_4[pos] = model_GN_pos
+    if pos == pos_test:
+        model_hist_B1_4 = invEM.modelHistory
 print('End')
-np.save('results/model_Opt_B1_4', model_Opt_B1_4)
-np.save('results/model_Opt_B1_4_hist', model_hist)
 
-#%%
-# Optimization Q 
+# Gauss-Newton Q 
 
 print('Estimating model B1-4 using Q')
 # Initialize the forward modelling class 
-EMf = EMf_3Lay_Opt_HVP_Q_1D(lambd, height, offsets, freq, filt, nlay=3)
+EMf = EMf_3Lay_GN_HVP_Q_1D(lambd, height, offsets, freq, filt, nlay=3)
 
 # Define transformation
 EMf.region(0).setTransModel(transThk)
 EMf.region(1).setTransModel(transSig)
-#EMf.transData = transData
 
 print('Initializing inversion')
 # Define inversion framework from pygimli
@@ -403,31 +368,27 @@ invEM = pg.Inversion()
 invEM.setForwardOperator(EMf) # set forward operator
 
 # Relative error array
-error = 1e-3 # relative error
 relativeError = np.ones_like(data_B1_4[0, :9]) * error
-model_Opt_B1_4 = np.zeros_like(model_B1_1)
+model_GN_Q_B1_4 = np.zeros_like(model_B1_1)
 
 # Start inversion
 print('Run inversion')
 # Perform inversion for each 1D model 
 for pos in range(npos):
     dataE = data_B1_4[pos, :9].copy()
-    model_Opt_pos = invEM.run(dataE, relativeError, startModel= m0, lam=lam, verbose=False)
-    model_Opt_B1_4[pos] = model_Opt_pos
+    model_GN_pos = invEM.run(dataE, relativeError, startModel= m0, lam=lam, verbose=False)
+    model_GN_Q_B1_4[pos] = model_GN_pos
 print('End')
-np.save('results/model_Opt_Q_B1_4', model_Opt_B1_4)
-    
-#%%    
-# Optimization IP 
+
+# Gauss-Newton IP 
 
 print('Estimating model B1-4 using IP')
 # Initialize the forward modelling class 
-EMf = EMf_3Lay_Opt_HVP_IP_1D(lambd, height, offsets, freq, filt, nlay=3)
+EMf = EMf_3Lay_GN_HVP_IP_1D(lambd, height, offsets, freq, filt, nlay=3)
 
 # Define transformation
 EMf.region(0).setTransModel(transThk)
 EMf.region(1).setTransModel(transSig)
-#EMf.transData = transData
 
 print('Initializing inversion')
 # Define inversion framework from pygimli
@@ -435,16 +396,35 @@ invEM = pg.Inversion()
 invEM.setForwardOperator(EMf) # set forward operator
 
 # Relative error array
-error = 1e-3 # relative error
 relativeError = np.ones_like(data_B1_4[0, 9:]) * error
-model_Opt_B1_4 = np.zeros_like(model_B1_4)
+model_GN_IP_B1_4 = np.zeros_like(model_B1_4)
 
 # Start inversion
 print('Run inversion')
 # Perform inversion for each 1D model 
 for pos in range(npos):
     dataE = data_B1_4[pos, 9:].copy()
-    model_Opt_pos = invEM.run(dataE, relativeError, startModel= m0, lam=lam, verbose=False)
-    model_Opt_B1_4[pos] = model_Opt_pos
+    model_GN_pos = invEM.run(dataE, relativeError, startModel= m0, lam=lam, verbose=False)
+    model_GN_IP_B1_4[pos] = model_GN_pos
 print('End')
-np.save('results/model_Opt_IP_B1_4', model_Opt_B1_4)
+
+# Store estimations
+np.save('results/model_GN_B1_1', model_GN_B1_1)
+np.save('results/model_GN_B1_1_hist', model_hist_B1_1)
+np.save('results/model_GN_Q_B1_1', model_GN_Q_B1_1)
+np.save('results/model_GN_IP_B1_1', model_GN_IP_B1_1)
+
+np.save('results/model_GN_B1_2', model_GN_B1_2)
+np.save('results/model_GN_B1_2_hist', model_hist_B1_2)
+np.save('results/model_GN_Q_B1_2', model_GN_Q_B1_2)
+np.save('results/model_GN_IP_B1_2', model_GN_IP_B1_2)
+
+np.save('results/model_GN_B1_3', model_GN_B1_3)
+np.save('results/model_GN_B1_3_hist', model_hist_B1_3)
+np.save('results/model_GN_Q_B1_3', model_GN_Q_B1_3)
+np.save('results/model_GN_IP_B1_3', model_GN_IP_B1_3)
+
+np.save('results/model_GN_B1_4', model_GN_B1_4)
+np.save('results/model_GN_B1_4_hist', model_hist_B1_4)
+np.save('results/model_GN_Q_B1_4', model_GN_Q_B1_4)
+np.save('results/model_GN_IP_B1_4', model_GN_IP_B1_4)
