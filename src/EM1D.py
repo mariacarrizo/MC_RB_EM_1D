@@ -1402,3 +1402,51 @@ def SolSpa_2Lay_sigma2_IP(lambd, height, offsets, freq, filt, model_true, data_t
     models_err = np.array(models_err)
 
     return err, models_err
+
+def SolSpa_3Lay_parallel(data_true, max_err, h1, h2, s1, s2, s3):
+    """ Calculate solution space in a 3-layered case 
+    
+    data true : true data
+    max_err : maximum error to evaluate
+    h1 : thickness of first layer [m]
+    h2 : thickness of second layer [m]
+    s1 : conductivity of first layer [mS/m]
+    s2 : conductivity of second layer [mS/m]
+    s3 : conductivity of third layer [mS/m]
+    """
+
+    mod = [h1, h2, s1, s2, s3]
+    dat = EMf_3Lay_HVP(lambd, s1, s2, s3, h1, h2, height, offsets, freq, filt)
+    nrse = nrmse(data_true, dat)
+
+    if nrse < max_err:
+        model_err = np.hstack((mod, nrse))
+        return model_err
+    
+def m0_Analysis_GN_3Lay(lambd, height, offsets, freq, filt, thicks, conds, sigma, data_true):
+    """ Function to perform Gauss-Newton inversion with an specific initial model m0
+    sigma : electrical conductivity of initial model
+    """
+    
+    m0 = [3, 3, sigma/1000, sigma/1000, sigma/1000]
+    lam = 0
+
+    
+    transThk = pg.trans.TransLogLU(np.min(thicks),np.max(thicks))
+    transSig = pg.trans.TransLogLU(np.min(conds),np.max(conds))
+    
+    EMf = EMf_3Lay_GN_HVP_1D(lambd, height, offsets, freq, filt, nlay=3)
+
+    # Define transformation
+    EMf.region(0).setTransModel(transThk)
+    EMf.region(1).setTransModel(transSig)
+
+    # Define inversion framework from pygimli
+    invEM = pg.Inversion()
+    invEM.setForwardOperator(EMf) # set forward operator
+
+    # Relative error array
+    error = 1e-3 # relative error
+    relativeError = np.ones_like(data_true[0]) * error
+    model_GN = invEM.run(data_true, relativeError, startModel= m0, lam=lam, verbose=False)
+    return model_GN
