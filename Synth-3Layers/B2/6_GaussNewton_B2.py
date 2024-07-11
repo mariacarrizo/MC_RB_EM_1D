@@ -1,4 +1,12 @@
-# Script to perform gradient based inversion on 3-layered 1D models
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+""" 
+Script Name: 6_GaussNewton_B2.py
+Description: Script to perform Gauss-Newton inversion in B2 cases 
+Author: @mariacarrizo
+Email: m.e.carrizomascarell@tudelft.nl
+Date created: 16/12/2023
+"""
 
 # import libraries
 import pygimli as pg
@@ -7,7 +15,7 @@ import sys
 sys.path.insert(1, '../../src')
 
 # Load forward modelling classes for 3-layered 1D models
-from EM1D import EMf_3Lay_Opt_HVP_1D, EMf_3Lay_Opt_HVP_Q_1D, EMf_3Lay_Opt_HVP_IP_1D
+from EM1D import EMf_3Lay_GN_HVP_1D, EMf_3Lay_GN_HVP_Q_1D, EMf_3Lay_GN_HVP_IP_1D
 
 # Import the conductivities and thicknesses used to create the LU table
 conds = np.load('../data/conds.npy')
@@ -35,18 +43,28 @@ freq = survey['freq']
 lambd = survey['lambd']
 filt = survey['filt']
 
+# Define initial model [h_1, h2, sigma_1, sigma_2, sigma_3] (sigmas in S/m)
 m0 = [3, 3, 100/1000, 100/1000, 100/1000]
+
+# Define regularization parameter (alpha in Equation 5)
 lam = 0
 
-#%%
-# Optimization Q + IP
+# relative error for inversion class
+error = 1e-3 
+
+# Define a position that you want to check the optimization history
+pos_test = 10
+
+# Defining inversion limits and transformations
+transThk = pg.trans.TransLogLU(1, 4)
+transSig = pg.trans.TransLogLU(10/1000, 2000/1000)
+
+#%% Case B2-1
+# Gauss-Newton Q + IP
 
 print('Estimating model B2-1 using Q+IP')
 # Initialize the forward modelling class 
-EMf = EMf_3Lay_Opt_HVP_1D(lambd, height, offsets, freq, filt, nlay=3)
-
-transThk = pg.trans.TransLogLU(np.min(thicks),np.max(thicks))
-transSig = pg.trans.TransLogLU(np.min(conds),np.max(conds))
+EMf = EMf_3Lay_GN_HVP_1D(lambd, height, offsets, freq, filt, nlay=3)
 
 # Define transformation
 EMf.region(0).setTransModel(transThk)
@@ -58,29 +76,23 @@ invEM = pg.Inversion()
 invEM.setForwardOperator(EMf) # set forward operator
 
 # Relative error array
-error = 1e-3 # relative error
 relativeError = np.ones_like(data_B2_1[0]) * error
-model_Opt_B2_1 = np.zeros_like(model_B2_1)
+model_GN_B2_1 = np.zeros_like(model_B2_1)
 
 # Start inversion
 print('Run inversion')
 # Perform inversion for each 1D model 
 for pos in range(npos):
     dataE = data_B2_1[pos].copy()
-    model_Opt_pos = invEM.run(dataE, relativeError, startModel= m0, lam=lam, verbose=False)
-    model_Opt_B2_1[pos] = model_Opt_pos
+    model_GN_pos = invEM.run(dataE, relativeError, startModel= m0, lam=lam, verbose=False)
+    model_GN_B2_1[pos] = model_GN_pos
 print('End')
-np.save('results/model_Opt_B2_1', model_Opt_B2_1)
 
-#%%
-# Optimization Q 
+# Gauss-Newton Q 
 
 print('Estimating model B2-1 using Q')
 # Initialize the forward modelling class 
-EMf = EMf_3Lay_Opt_HVP_Q_1D(lambd, height, offsets, freq, filt, nlay=3)
-
-transThk = pg.trans.TransLogLU(0.1,7)
-transSig = pg.trans.TransLogLU(10/1000,2000/1000)
+EMf = EMf_3Lay_GN_HVP_Q_1D(lambd, height, offsets, freq, filt, nlay=3)
 
 # Define transformation
 EMf.region(0).setTransModel(transThk)
@@ -92,29 +104,23 @@ invEM = pg.Inversion()
 invEM.setForwardOperator(EMf) # set forward operator
 
 # Relative error array
-error = 1e-3 # relative error
 relativeError = np.ones_like(data_B2_1[0, :9]) * error
-model_Opt_B2_1 = np.zeros_like(model_B2_1)
+model_GN_Q_B2_1 = np.zeros_like(model_B2_1)
 
 # Start inversion
 print('Run inversion')
 # Perform inversion for each 1D model 
 for pos in range(npos):
     dataE = data_B2_1[pos, :9].copy()
-    model_Opt_pos = invEM.run(dataE, relativeError, startModel= m0, lam=lam, verbose=False)
-    model_Opt_B2_1[pos] = model_Opt_pos
+    model_GN_pos = invEM.run(dataE, relativeError, startModel= m0, lam=lam, verbose=False)
+    model_GN_Q_B2_1[pos] = model_GN_pos
 print('End')
-np.save('results/model_Opt_Q_B2_1', model_Opt_B2_1)
-    
-#%%    
-# Optimization IP 
+
+# Gauss-Newton IP 
 
 print('Estimating model B2-1 using IP')
 # Initialize the forward modelling class 
-EMf = EMf_3Lay_Opt_HVP_IP_1D(lambd, height, offsets, freq, filt, nlay=3)
-
-transThk = pg.trans.TransLogLU(0.1,7)
-transSig = pg.trans.TransLogLU(10/1000,2000/1000)
+EMf = EMf_3Lay_GN_HVP_IP_1D(lambd, height, offsets, freq, filt, nlay=3)
 
 # Define transformation
 EMf.region(0).setTransModel(transThk)
@@ -126,29 +132,24 @@ invEM = pg.Inversion()
 invEM.setForwardOperator(EMf) # set forward operator
 
 # Relative error array
-error = 1e-3 # relative error
 relativeError = np.ones_like(data_B2_1[0, 9:]) * error
-model_Opt_B2_1 = np.zeros_like(model_B2_1)
+model_GN_IP_B2_1 = np.zeros_like(model_B2_1)
 
 # Start inversion
 print('Run inversion')
 # Perform inversion for each 1D model 
 for pos in range(npos):
     dataE = data_B2_1[pos, 9:].copy()
-    model_Opt_pos = invEM.run(dataE, relativeError, startModel= m0, lam=lam, verbose=False)
-    model_Opt_B2_1[pos] = model_Opt_pos
+    model_GN_pos = invEM.run(dataE, relativeError, startModel= m0, lam=lam, verbose=False)
+    model_GN_IP_B2_1[pos] = model_GN_pos
 print('End')
-np.save('results/model_Opt_IP_B2_1', model_Opt_B2_1)
 
-#%%
-# Optimization Q + IP
+#%% Case B2-2
+# Gauss-Newton Q + IP
 
 print('Estimating model B2-2 using Q+IP')
 # Initialize the forward modelling class 
-EMf = EMf_3Lay_Opt_HVP_1D(lambd, height, offsets, freq, filt, nlay=3)
-
-transThk = pg.trans.TransLogLU(0.1,7)
-transSig = pg.trans.TransLogLU(10/1000,2000/1000)
+EMf = EMf_3Lay_GN_HVP_1D(lambd, height, offsets, freq, filt, nlay=3)
 
 # Define transformation
 EMf.region(0).setTransModel(transThk)
@@ -160,29 +161,23 @@ invEM = pg.Inversion()
 invEM.setForwardOperator(EMf) # set forward operator
 
 # Relative error array
-error = 1e-3 # relative error
 relativeError = np.ones_like(data_B2_2[0]) * error
-model_Opt_B2_2 = np.zeros_like(model_B2_2)
+model_GN_B2_2 = np.zeros_like(model_B2_2)
 
 # Start inversion
 print('Run inversion')
 # Perform inversion for each 1D model 
 for pos in range(npos):
     dataE = data_B2_2[pos].copy()
-    model_Opt_pos = invEM.run(dataE, relativeError, startModel= m0, lam=lam, verbose=False)
-    model_Opt_B2_2[pos] = model_Opt_pos
+    model_GN_pos = invEM.run(dataE, relativeError, startModel= m0, lam=lam, verbose=False)
+    model_GN_B2_2[pos] = model_GN_pos
 print('End')
-np.save('results/model_Opt_B2_2', model_Opt_B2_2)
 
-#%%
-# Optimization Q 
+# Gauss-Newton Q 
 
 print('Estimating model B2-2 using Q')
 # Initialize the forward modelling class 
-EMf = EMf_3Lay_Opt_HVP_Q_1D(lambd, height, offsets, freq, filt, nlay=3)
-
-transThk = pg.trans.TransLogLU(0.1,7)
-transSig = pg.trans.TransLogLU(10/1000,2000/1000)
+EMf = EMf_3Lay_GN_HVP_Q_1D(lambd, height, offsets, freq, filt, nlay=3)
 
 # Define transformation
 EMf.region(0).setTransModel(transThk)
@@ -194,29 +189,23 @@ invEM = pg.Inversion()
 invEM.setForwardOperator(EMf) # set forward operator
 
 # Relative error array
-error = 1e-3 # relative error
 relativeError = np.ones_like(data_B2_2[0, :9]) * error
-model_Opt_B2_2 = np.zeros_like(model_B2_2)
+model_GN_Q_B2_2 = np.zeros_like(model_B2_2)
 
 # Start inversion
 print('Run inversion')
 # Perform inversion for each 1D model 
 for pos in range(npos):
     dataE = data_B2_2[pos, :9].copy()
-    model_Opt_pos = invEM.run(dataE, relativeError, startModel= m0, lam=lam, verbose=False)
-    model_Opt_B2_2[pos] = model_Opt_pos
+    model_GN_pos = invEM.run(dataE, relativeError, startModel= m0, lam=lam, verbose=False)
+    model_GN_Q_B2_2[pos] = model_GN_pos
 print('End')
-np.save('results/model_Opt_Q_B2_2', model_Opt_B2_2)
-    
-#%%    
-# Optimization IP 
+
+# Gauss-Newton IP 
 
 print('Estimating model B2-2 using IP')
 # Initialize the forward modelling class 
-EMf = EMf_3Lay_Opt_HVP_IP_1D(lambd, height, offsets, freq, filt, nlay=3)
-
-transThk = pg.trans.TransLogLU(0.1,7)
-transSig = pg.trans.TransLogLU(10/1000,2000/1000)
+EMf = EMf_3Lay_GN_HVP_IP_1D(lambd, height, offsets, freq, filt, nlay=3)
 
 # Define transformation
 EMf.region(0).setTransModel(transThk)
@@ -228,29 +217,24 @@ invEM = pg.Inversion()
 invEM.setForwardOperator(EMf) # set forward operator
 
 # Relative error array
-error = 1e-3 # relative error
 relativeError = np.ones_like(data_B2_2[0, 9:]) * error
-model_Opt_B2_2 = np.zeros_like(model_B2_2)
+model_GN_IP_B2_2 = np.zeros_like(model_B2_2)
 
 # Start inversion
 print('Run inversion')
 # Perform inversion for each 1D model 
 for pos in range(npos):
     dataE = data_B2_2[pos, 9:].copy()
-    model_Opt_pos = invEM.run(dataE, relativeError, startModel= m0, lam=lam, verbose=False)
-    model_Opt_B2_2[pos] = model_Opt_pos
+    model_GN_pos = invEM.run(dataE, relativeError, startModel= m0, lam=lam, verbose=False)
+    model_GN_IP_B2_2[pos] = model_GN_pos
 print('End')
-np.save('results/model_Opt_IP_B2_2', model_Opt_B2_2)
 
-#%%
-# Optimization Q + IP
-m0 = [3, 3, 200/1000, 200/1000, 200/1000]
+#%% Case B2-3
+# Gauss-Newton Q + IP
+
 print('Estimating model B2-3 using Q+IP')
 # Initialize the forward modelling class 
-EMf = EMf_3Lay_Opt_HVP_1D(lambd, height, offsets, freq, filt, nlay=3)
-
-transThk = pg.trans.TransLogLU(0.1,7)
-transSig = pg.trans.TransLogLU(10/1000,2000/1000)
+EMf = EMf_3Lay_GN_HVP_1D(lambd, height, offsets, freq, filt, nlay=3)
 
 # Define transformation
 EMf.region(0).setTransModel(transThk)
@@ -262,29 +246,23 @@ invEM = pg.Inversion()
 invEM.setForwardOperator(EMf) # set forward operator
 
 # Relative error array
-error = 1e-3 # relative error
 relativeError = np.ones_like(data_B2_3[0]) * error
-model_Opt_B2_3 = np.zeros_like(model_B2_3)
+model_GN_B2_3 = np.zeros_like(model_B2_3)
 
 # Start inversion
 print('Run inversion')
 # Perform inversion for each 1D model 
 for pos in range(npos):
     dataE = data_B2_3[pos].copy()
-    model_Opt_pos = invEM.run(dataE, relativeError, startModel= m0, lam=lam, verbose=False)
-    model_Opt_B2_3[pos] = model_Opt_pos
+    model_GN_pos = invEM.run(dataE, relativeError, startModel= m0, lam=lam, verbose=False)
+    model_GN_B2_3[pos] = model_GN_pos
 print('End')
-np.save('results/model_Opt_B2_3', model_Opt_B2_3)
 
-#%%
-# Optimization Q 
+# Gauss-Newton Q 
 
 print('Estimating model B2-3 using Q')
 # Initialize the forward modelling class 
-EMf = EMf_3Lay_Opt_HVP_Q_1D(lambd, height, offsets, freq, filt, nlay=3)
-
-transThk = pg.trans.TransLogLU(0.1,7)
-transSig = pg.trans.TransLogLU(10/1000,2000/1000)
+EMf = EMf_3Lay_GN_HVP_Q_1D(lambd, height, offsets, freq, filt, nlay=3)
 
 # Define transformation
 EMf.region(0).setTransModel(transThk)
@@ -296,29 +274,23 @@ invEM = pg.Inversion()
 invEM.setForwardOperator(EMf) # set forward operator
 
 # Relative error array
-error = 1e-3 # relative error
 relativeError = np.ones_like(data_B2_3[0, :9]) * error
-model_Opt_B2_3 = np.zeros_like(model_B2_3)
+model_GN_Q_B2_3 = np.zeros_like(model_B2_3)
 
 # Start inversion
 print('Run inversion')
 # Perform inversion for each 1D model 
 for pos in range(npos):
     dataE = data_B2_3[pos, :9].copy()
-    model_Opt_pos = invEM.run(dataE, relativeError, startModel= m0, lam=lam, verbose=False)
-    model_Opt_B2_3[pos] = model_Opt_pos
+    model_GN_pos = invEM.run(dataE, relativeError, startModel= m0, lam=lam, verbose=False)
+    model_GN_Q_B2_3[pos] = model_GN_pos
 print('End')
-np.save('results/model_Opt_Q_B2_3', model_Opt_B2_3)
-    
-#%%    
-# Optimization IP 
+
+# Gauss-Newton IP 
 
 print('Estimating model B2-3 using IP')
 # Initialize the forward modelling class 
-EMf = EMf_3Lay_Opt_HVP_IP_1D(lambd, height, offsets, freq, filt, nlay=3)
-
-transThk = pg.trans.TransLogLU(0.1,7)
-transSig = pg.trans.TransLogLU(10/1000,2000/1000)
+EMf = EMf_3Lay_GN_HVP_IP_1D(lambd, height, offsets, freq, filt, nlay=3)
 
 # Define transformation
 EMf.region(0).setTransModel(transThk)
@@ -330,29 +302,23 @@ invEM = pg.Inversion()
 invEM.setForwardOperator(EMf) # set forward operator
 
 # Relative error array
-error = 1e-3 # relative error
 relativeError = np.ones_like(data_B2_3[0, 9:]) * error
-model_Opt_B2_3 = np.zeros_like(model_B2_3)
+model_GN_IP_B2_3 = np.zeros_like(model_B2_3)
 
 # Start inversion
 print('Run inversion')
 # Perform inversion for each 1D model 
 for pos in range(npos):
     dataE = data_B2_3[pos, 9:].copy()
-    model_Opt_pos = invEM.run(dataE, relativeError, startModel= m0, lam=lam, verbose=False)
-    model_Opt_B2_3[pos] = model_Opt_pos
+    model_GN_pos = invEM.run(dataE, relativeError, startModel= m0, lam=lam, verbose=False)
+    model_GN_IP_B2_3[pos] = model_GN_pos
 print('End')
-np.save('results/model_Opt_IP_B2_3', model_Opt_B2_3)
 
-#%%
-# Optimization Q + IP
-m0 = [3, 3, 400/1000, 400/1000, 400/1000]
+# Gauss-Newton Q + IP
+
 print('Estimating model B2-4 using Q+IP')
 # Initialize the forward modelling class 
-EMf = EMf_3Lay_Opt_HVP_1D(lambd, height, offsets, freq, filt, nlay=3)
-
-transThk = pg.trans.TransLogLU(0.1,7)
-transSig = pg.trans.TransLogLU(10/1000,2000/1000)
+EMf = EMf_3Lay_GN_HVP_1D(lambd, height, offsets, freq, filt, nlay=3)
 
 # Define transformation
 EMf.region(0).setTransModel(transThk)
@@ -364,29 +330,23 @@ invEM = pg.Inversion()
 invEM.setForwardOperator(EMf) # set forward operator
 
 # Relative error array
-error = 1e-3 # relative error
 relativeError = np.ones_like(data_B2_4[0]) * error
-model_Opt_B2_4 = np.zeros_like(model_B2_4)
+model_GN_B2_4 = np.zeros_like(model_B2_4)
 
 # Start inversion
 print('Run inversion')
 # Perform inversion for each 1D model 
 for pos in range(npos):
     dataE = data_B2_4[pos].copy()
-    model_Opt_pos = invEM.run(dataE, relativeError, startModel= m0, lam=lam, verbose=False)
-    model_Opt_B2_4[pos] = model_Opt_pos
+    model_GN_pos = invEM.run(dataE, relativeError, startModel= m0, lam=lam, verbose=False)
+    model_GN_B2_4[pos] = model_GN_pos
 print('End')
-np.save('results/model_Opt_B2_4', model_Opt_B2_4)
 
-#%%
-# Optimization Q 
+# Gauss-Newton Q 
 
 print('Estimating model B2-4 using Q')
 # Initialize the forward modelling class 
-EMf = EMf_3Lay_Opt_HVP_Q_1D(lambd, height, offsets, freq, filt, nlay=3)
-
-transThk = pg.trans.TransLogLU(0.1,7)
-transSig = pg.trans.TransLogLU(10/1000,2000/1000)
+EMf = EMf_3Lay_GN_HVP_Q_1D(lambd, height, offsets, freq, filt, nlay=3)
 
 # Define transformation
 EMf.region(0).setTransModel(transThk)
@@ -398,29 +358,23 @@ invEM = pg.Inversion()
 invEM.setForwardOperator(EMf) # set forward operator
 
 # Relative error array
-error = 1e-3 # relative error
 relativeError = np.ones_like(data_B2_4[0, :9]) * error
-model_Opt_B2_4 = np.zeros_like(model_B2_1)
+model_GN_Q_B2_4 = np.zeros_like(model_B2_1)
 
 # Start inversion
 print('Run inversion')
 # Perform inversion for each 1D model 
 for pos in range(npos):
     dataE = data_B2_4[pos, :9].copy()
-    model_Opt_pos = invEM.run(dataE, relativeError, startModel= m0, lam=lam, verbose=False)
-    model_Opt_B2_4[pos] = model_Opt_pos
+    model_GN_pos = invEM.run(dataE, relativeError, startModel= m0, lam=lam, verbose=False)
+    model_GN_Q_B2_4[pos] = model_GN_pos
 print('End')
-np.save('results/model_Opt_Q_B2_4', model_Opt_B2_4)
-    
-#%%    
-# Optimization IP 
+
+# Gauss-Newton IP 
 
 print('Estimating model B2-4 using IP')
 # Initialize the forward modelling class 
-EMf = EMf_3Lay_Opt_HVP_IP_1D(lambd, height, offsets, freq, filt, nlay=3)
-
-transThk = pg.trans.TransLogLU(0.1,7)
-transSig = pg.trans.TransLogLU(10/1000,2000/1000)
+EMf = EMf_3Lay_GN_HVP_IP_1D(lambd, height, offsets, freq, filt, nlay=3)
 
 # Define transformation
 EMf.region(0).setTransModel(transThk)
@@ -432,16 +386,31 @@ invEM = pg.Inversion()
 invEM.setForwardOperator(EMf) # set forward operator
 
 # Relative error array
-error = 1e-3 # relative error
 relativeError = np.ones_like(data_B2_4[0, 9:]) * error
-model_Opt_B2_4 = np.zeros_like(model_B2_4)
+model_GN_IP_B2_4 = np.zeros_like(model_B2_4)
 
 # Start inversion
 print('Run inversion')
 # Perform inversion for each 1D model 
 for pos in range(npos):
     dataE = data_B2_4[pos, 9:].copy()
-    model_Opt_pos = invEM.run(dataE, relativeError, startModel= m0, lam=lam, verbose=False)
-    model_Opt_B2_4[pos] = model_Opt_pos
+    model_GN_pos = invEM.run(dataE, relativeError, startModel= m0, lam=lam, verbose=False)
+    model_GN_IP_B2_4[pos] = model_GN_pos
 print('End')
-np.save('results/model_Opt_IP_B2_4', model_Opt_B2_4)
+
+# Store results
+np.save('results/model_GN_B2_1', model_GN_B2_1)
+np.save('results/model_GN_Q_B2_1', model_GN_Q_B2_1)
+np.save('results/model_GN_IP_B2_1', model_GN_IP_B2_1)
+
+np.save('results/model_GN_B2_2', model_GN_B2_2)
+np.save('results/model_GN_Q_B2_2', model_GN_Q_B2_2)
+np.save('results/model_GN_IP_B2_2', model_GN_IP_B2_2)
+
+np.save('results/model_GN_B2_3', model_GN_B2_3)
+np.save('results/model_GN_Q_B2_3', model_GN_Q_B2_3)
+np.save('results/model_GN_IP_B2_3', model_GN_IP_B2_3)
+
+np.save('results/model_GN_B2_4', model_GN_B2_4)
+np.save('results/model_GN_Q_B2_4', model_GN_Q_B2_4)
+np.save('results/model_GN_IP_B2_4', model_GN_IP_B2_4)
