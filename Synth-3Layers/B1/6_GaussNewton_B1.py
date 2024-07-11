@@ -56,8 +56,8 @@ error = 1e-3
 pos_test = 10
 
 # Defining inversion limits and transformations
-transThk = pg.trans.TransLogLU(np.min(thick), np.max(thick))
-transSig = pg.trans.TransLogLU(np.min(conds), np.max(conds))
+transThk = pg.trans.TransLogLU(1, 4)
+transSig = pg.trans.TransLogLU(10/1000, 2000/1000)
 
 #%%
 # Gauss-Newton Q + IP
