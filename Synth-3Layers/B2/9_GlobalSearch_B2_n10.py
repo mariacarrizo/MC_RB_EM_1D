@@ -1,5 +1,12 @@
-### Code that creates searches in Lookup table for the indices of best data fit 
-### (min data misfit) for 3-layered 1D models using noisy data 2.5 %
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+""" 
+Script Name: 9_GlobalSearch_B2_n10.py
+Description: Script to perform Global Search in B2 cases in noise presence 10%
+Author: @mariacarrizo
+Email: m.e.carrizomascarell@tudelft.nl
+Date created: 16/12/2023
+"""
 
 ## Import libraries
 import numpy as np

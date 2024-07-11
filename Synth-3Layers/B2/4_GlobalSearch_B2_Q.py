@@ -1,5 +1,12 @@
-### Code that creates searches in Lookup table for the indices of best data fit 
-### (min data misfit) for 3-layered 1D models using only Quadrature
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+""" 
+Script Name: 4_GlobalSearch_B2_Q.py
+Description: Script to perform Global Search in B2 cases using Quadrature only
+Author: @mariacarrizo
+Email: m.e.carrizomascarell@tudelft.nl
+Date created: 16/12/2023
+"""
 
 ## Import libraries
 import numpy as np
