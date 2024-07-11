@@ -877,9 +877,9 @@ def Plot_Models_3Lay_QIP(model_true, model_GS, model_GN, data_true, data_GS, dat
     ax[1,1].tick_params(labelsize=fs)
     ax[1,1].set_title('Estimated model - GN', fontsize=fs2)
     
-    model_true_grid = grid(model_true)
-    model_GS_grid = grid(model_GS)
-    model_GN_grid = grid(model_GN)
+    model_true_grid = grid(model_true, nlay=3)
+    model_GS_grid = grid(model_GS, nlay=3)
+    model_GN_grid = grid(model_GN, nlay=3)
     
     diff_GS = 100*np.abs(model_true_grid - model_GS_grid)/model_true_grid
     diff_GN = 100*np.abs(model_true_grid - model_GN_grid)/model_true_grid
@@ -959,9 +959,9 @@ def Plot_Models_3Lay(model_true, model_GS, model_GN, data_true, data_GS, data_GN
     ax[0,0].plot(x,-z1,':k')
     ax[0,0].plot(x,-z1-z2,':k')
     
-    model_true_grid = grid(model_true)
-    model_GS_grid = grid(model_GS)
-    model_GN_grid = grid(model_GN)
+    model_true_grid = grid(model_true, nlay=3)
+    model_GS_grid = grid(model_GS, nlay=3)
+    model_GN_grid = grid(model_GN, nlay=3)
     
     diff_GS = 100*np.abs(model_true_grid - model_GS_grid)/model_true_grid
     diff_GN = 100*np.abs(model_true_grid - model_GN_grid)/model_true_grid
@@ -1060,13 +1060,13 @@ def Plot_Noise_3Lay(model_true, model_GS_n2, model_GS_n5, model_GS_n10, model_GN
     ax[0,2].plot(x, -z1-z2, ':k')
     
     # Rel diff  
-    model_true_grid = grid(model_true)
-    model_GS_n2_grid = grid(model_GS_n2)
-    model_GS_n5_grid = grid(model_GS_n5)
-    model_GS_n10_grid = grid(model_GS_n10)
-    model_GN_n2_grid = grid(model_GN_n2)
-    model_GN_n5_grid = grid(model_GN_n5)
-    model_GN_n10_grid = grid(model_GN_n10)
+    model_true_grid = grid(model_true, nlay=3)
+    model_GS_n2_grid = grid(model_GS_n2, nlay=3)
+    model_GS_n5_grid = grid(model_GS_n5, nlay=3)
+    model_GS_n10_grid = grid(model_GS_n10, nlay=3)
+    model_GN_n2_grid = grid(model_GN_n2, nlay=3)
+    model_GN_n5_grid = grid(model_GN_n5, nlay=3)
+    model_GN_n10_grid = grid(model_GN_n10, nlay=3)
     
     diff_GS_n2 = 100*np.abs(model_true_grid - model_GS_n2_grid)/model_true_grid
     diff_GS_n5 = 100*np.abs(model_true_grid - model_GS_n5_grid)/model_true_grid
