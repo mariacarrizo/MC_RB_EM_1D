@@ -1403,7 +1403,7 @@ def SolSpa_2Lay_sigma2_IP(lambd, height, offsets, freq, filt, model_true, data_t
 
     return err, models_err
 
-def SolSpa_3Lay_parallel(data_true, max_err, h1, h2, s1, s2, s3):
+def SolSpa_3Lay_parallel(lambd, offsets, height, freq, filt, data_true, max_err, h1, h2, s1, s2, s3):
     """ Calculate solution space in a 3-layered case 
     
     data true : true data

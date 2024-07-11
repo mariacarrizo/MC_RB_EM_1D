@@ -29,6 +29,14 @@ conds = np.load('../data/conds.npy')
 thicks = np.load('../data/thicks.npy')
 nsl = len(conds)  # Lookupt table sampling number
 
+# Load survey parameters
+survey = np.load('../data/survey_3Lay.npy', allow_pickle=True).item()
+offsets = survey['offsets']
+height = survey['height']
+freq = survey['freq']
+lambd = survey['lambd']
+filt = survey['filt']
+
 # For example let's check the 1D model following position
 pos = 10
 
@@ -40,7 +48,8 @@ max_err = 0.3 # Testing larger noise
 print('Start calculating error B1-1 ...')
 startTime = time.time()
 
-models_err_B1_1 = Parallel(n_jobs=n_workers,verbose=0)(delayed(SolSpa_3Lay_parallel)(data_B1_1[pos], max_err, h1, h2, s1, s2, s3)
+models_err_B1_1 = Parallel(n_jobs=n_workers,verbose=0)(delayed(SolSpa_3Lay_parallel)(lambd, offsets, height, freq, filt, 
+                                                       data_B1_1[pos], max_err, h1, h2, s1, s2, s3)
                                            for h1 in thicks for h2 in thicks for s1 in conds for s2 in conds for s3 in conds)
 
 executionTime = ((time.time() - startTime))/60
@@ -57,7 +66,8 @@ np.save('results/err_B1_1_0.3', err_B1_1_snip)
 print('Start calculating error B1-2 ...')
 startTime = time.time()
 
-models_err_B1_2 = Parallel(n_jobs=n_workers,verbose=0)(delayed(SolSpa_3Lay_parallel)(data_B1_2[pos], max_err, h1, h2, s1, s2, s3)
+models_err_B1_2 = Parallel(n_jobs=n_workers,verbose=0)(delayed(SolSpa_3Lay_parallel)(lambd, offsets, height, freq, filt, 
+                                                       data_B1_2[pos], max_err, h1, h2, s1, s2, s3)
                                            for h1 in thicks for h2 in thicks for s1 in conds for s2 in conds for s3 in conds)
 
 executionTime = ((time.time() - startTime))/60
@@ -74,7 +84,8 @@ np.save('results/err_B1_2_0.3', err_B1_2_snip)
 print('Start calculating error B1-3 ...')
 startTime = time.time()
 
-models_err_B1_3 = Parallel(n_jobs=n_workers,verbose=0)(delayed(SolSpa_3Lay_parallel)(data_B1_3[pos], max_err, h1, h2, s1, s2, s3)
+models_err_B1_3 = Parallel(n_jobs=n_workers,verbose=0)(delayed(SolSpa_3Lay_parallel)(lambd, offsets, height, freq, filt, 
+                                                       data_B1_3[pos], max_err, h1, h2, s1, s2, s3)
                                            for h1 in thicks for h2 in thicks for s1 in conds for s2 in conds for s3 in conds)
 
 executionTime = ((time.time() - startTime))/60
@@ -91,7 +102,8 @@ np.save('results/err_B1_3_0.3', err_B1_3_snip)
 print('Start calculating error B1-4 ...')
 startTime = time.time()
 
-models_err_B1_4 = Parallel(n_jobs=n_workers,verbose=0)(delayed(SolSpa_3Lay_parallel)(data_B1_4[pos], max_err, h1, h2, s1, s2, s3)
+models_err_B1_4 = Parallel(n_jobs=n_workers,verbose=0)(delayed(SolSpa_3Lay_parallel)(lambd, offsets, height, freq, filt, 
+                                                       data_B1_4[pos], max_err, h1, h2, s1, s2, s3)
                                            for h1 in thicks for h2 in thicks for s1 in conds for s2 in conds for s3 in conds)
 
 executionTime = ((time.time() - startTime))/60
