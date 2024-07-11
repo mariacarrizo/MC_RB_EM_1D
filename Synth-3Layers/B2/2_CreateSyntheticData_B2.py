@@ -1,4 +1,12 @@
-# Script to simulate synthetic data for case B.1
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+""" 
+Script Name: 2_CreateSyntheticData_B2.py
+Description: Script to create synthetic models in B2 cases
+Author: @mariacarrizo
+Email: m.e.carrizomascarell@tudelft.nl
+Date created: 16/12/2023
+"""
 
 # Import libraries
 import numpy as np
