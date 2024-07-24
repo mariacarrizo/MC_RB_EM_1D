@@ -1062,6 +1062,18 @@ def EMf_2Lay_HV_field(lambd, sigma1, sigma2, h1, height, offsets, freq, filt):
 
 
 class EMf_2Lay_GN_HV_field(pg.Modelling):
+    """ Class to Initialize the model for Gauss-Newton inversion
+    using using Q and IP components of the measurements
+    with H and V geometries for a 2-layered model (Field case)
+    
+    Input:
+        lambd : radial component of the wavenumber
+        height : height of the instrument above ground in m
+        offsets : coil separation in m
+        freq : frequency in Hertz
+        filt : filter to perform the hankel transform
+        nlay : number of layers
+    """
     def __init__(self, lambd, height, offsets, freq, filt, nlay):
         self.nlay = nlay
         mesh = pg.meshtools.createMesh1DBlock(nlay)
