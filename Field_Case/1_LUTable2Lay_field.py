@@ -1,4 +1,12 @@
-# For generating 2-layered lookup table for the Field case
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Script Name: 1_LUTable2Lay_field.py
+Description: Script for generating 2-layered lookup table for Field case
+Author: @mariacarrizo
+Email: mecarrizomasca@tudelft.nl
+Date created: 15/12/2023
+"""
 
 # import libraries
 import numpy as np

@@ -1,4 +1,12 @@
-# Script to perform global search inversion for Field case
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+""" 
+Script Name: 2_GlobalSearch.py
+Description: Script to perform global search inversion for Field case
+Author: @mariacarrizo
+Email: m.e.carrizomascarell@tudelft.nl
+Date created: 17/12/2023
+"""
 
 # Import libraries
 import numpy as np
@@ -29,16 +37,17 @@ data = np.array(pd.concat([Dataframe.loc[:,'H2Q':'V8Q'], Dataframe.loc[:,'H4IP':
 npos = len(data)
 
 # Estimate with both Quadrature and In Phase
-model_est = [] # Empty array for estimated model
+
+model_GS = [] # Empty array for estimated model
 
 print('Starting global search ...')
 
 starttime = time.time()
 for p in range(npos):
-    model_est.append(GlobalSearch_2Lay(LUT, data[p], conds, thicks, nsl=len(conds)))
+    model_GS.append(GlobalSearch_2Lay(LUT, data[p], conds, thicks, nsl=len(conds)))
 endtime = time.time() - starttime
 
 print('Global search Q+IP excution for ', npos, ' positions: ', f"{(endtime/60):.3}", 'minutes')
 
 # Save estimated models
-np.save('results/model_2Lay_GS_field', model_est)
+np.save('results/model_2Lay_GS_field', model_GS)
