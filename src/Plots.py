@@ -1354,3 +1354,79 @@ def Plot_SolSpa_3Lay(models_err, err, model_true, model_GS, model_GN, model_ini,
     clb.ax.tick_params(labelsize=9)
     plt.show()
     plt.tight_layout()
+    
+def PlotLine(ax, model, elevation, dist, vmin=1, vmax=500, depthmax=8, colorbar=False, xlab=False, ylab=False):
+    """ Function to plot the estimated positions in a stitched 2D section
+    
+    Parameters:
+    1. model: Estimated model in each position from the global search 
+       m = [sigma_1, sigma_2, h_1]
+    2. elevation: Elevation values [m]
+    3. dist = Horizontal distance of the section [m]
+    4. vmin = minimum value for colorbar
+    5. vmax = maximum value for colorbar
+    
+    """
+    
+    # Arrays for plotting
+    
+    npos = len(model)
+    depthmax = -np.min(elevation)+depthmax
+    
+    ny = 101
+    y = np.linspace(0, depthmax, ny)
+    sigy = np.zeros((len(model), ny))
+    
+    sigma_1 = model[:,1]
+    sigma_2 = model[:,2]
+    thick_1 = model[:,0]
+    
+    depth = thick_1 -(elevation)
+    
+    # Conductivities array to be plotted
+    for i in range(npos):
+        y0 = 0
+        while y[y0] <= -elevation[i]: # - sign because the elevations are negative!!
+            sigy[i, y0:] = 0
+            y0 += 1       
+        while y[y0] <= depth[i]:
+            sigy[i, y0:] = sigma_1[i]
+            y0 += 1
+        sigy[i, y0:] = sigma_2[i]
+            
+    #fig, ax = plt.subplots(figsize = (7,6))
+    pos = ax.imshow((sigy*1000).T, cmap='Spectral_r', interpolation='none', 
+                    extent= [0,dist,depthmax+2,0], vmin = vmin, vmax=vmax, norm='log' )
+
+    if colorbar==True:
+        clb = fig.colorbar(pos, shrink=0.4)
+        #clb.ax.tick_params(labelsize=8)
+        clb.set_label('$\sigma$ [mS/m]',  )
+
+    if ylab == True:
+        ax.set_ylabel('Depth [m]', fontsize=8)
+    if xlab == True:
+        ax.set_xlabel('Distance [m]', fontsize=8)
+
+    ax.tick_params(labelsize=8)
+    return pos
+    
+
+def distance(lat1, lat2, lon1, lon2):
+    """ Function to calculate the horizontal distance between to 
+    coordinates in degrees """
+    # Approximate radius of earth in km
+    R = 6373.0
+
+    lat1 = np.radians(lat1)  
+    lon1 = np.radians(lon1)
+    lat2 = np.radians(lat2)
+    lon2 = np.radians(lon2)
+
+    dlon = lon2 - lon1
+    dlat = lat2 - lat1
+
+    a = np.sin(dlat / 2)**2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlon / 2)**2
+    c = 2 * np.arctan2(np.sqrt(a), np.sqrt(1-a))
+    distance = R * c # distance in km
+    return distance*1000 # distance in m
