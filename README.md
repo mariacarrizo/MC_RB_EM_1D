@@ -1,6 +1,6 @@
 # MC_RB_EM_1D
 
-This repo contains the implementation of the algorithms shown in:  [https://doi.org/10.1016/j.cageo.2024.105732] [Estimation of electrical conductivity models using multi-coil rigid-boom electromagnetic induction measurements].
+This repo contains the implementation of the algorithms shown in: [Estimation of electrical conductivity models using multi-coil rigid-boom electromagnetic induction measurements](<https://doi.org/10.1016/j.cageo.2024.105732>).
 
 The repository includes:
 - Python 3 codes for creating the synthetic data
